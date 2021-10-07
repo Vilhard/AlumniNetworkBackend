@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AlumniNetworkBackend.Models.Domain
+{
+    public class Event
+    {
+        public DateTime LastUpdated { get; set; }
+        public User CreatedBy { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        [MaxLength(30)]
+        public string Description { get; set; }
+        public bool AllowGuests { get; set; }
+        public string BannerImg { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
+}
