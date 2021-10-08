@@ -4,14 +4,16 @@ using AlumniNetworkBackend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AlumniNetworkBackend.Migrations
 {
     [DbContext(typeof(AlumniNetworkDbContext))]
-    partial class AlumniNetworkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211007180344_Added actions")]
+    partial class Addedactions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,9 +102,6 @@ namespace AlumniNetworkBackend.Migrations
                     b.Property<int?>("TargetGroupId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TargetPostId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("TargetTopicId")
                         .HasColumnType("int");
 
@@ -121,8 +120,6 @@ namespace AlumniNetworkBackend.Migrations
                     b.HasIndex("TargetEventId");
 
                     b.HasIndex("TargetGroupId");
-
-                    b.HasIndex("TargetPostId");
 
                     b.HasIndex("TargetTopicId");
 
@@ -208,10 +205,6 @@ namespace AlumniNetworkBackend.Migrations
                         .WithMany()
                         .HasForeignKey("TargetGroupId");
 
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.Post", "TargetPost")
-                        .WithMany()
-                        .HasForeignKey("TargetPostId");
-
                     b.HasOne("AlumniNetworkBackend.Models.Domain.Topic", "TargetTopic")
                         .WithMany()
                         .HasForeignKey("TargetTopicId");
@@ -227,8 +220,6 @@ namespace AlumniNetworkBackend.Migrations
                     b.Navigation("TargetEvent");
 
                     b.Navigation("TargetGroup");
-
-                    b.Navigation("TargetPost");
 
                     b.Navigation("TargetTopic");
 
