@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlumniNetworkBackend.Migrations
 {
     [DbContext(typeof(AlumniNetworkDbContext))]
-    [Migration("20211008083158_Added TargetPost")]
-    partial class AddedTargetPost
+    [Migration("20211008101257_InitialDB")]
+    partial class InitialDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,6 +60,72 @@ namespace AlumniNetworkBackend.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventGroupInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("EventGroupInvite");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventTopicInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("EventTopicInvite");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventUserInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EventUserInvite");
+                });
+
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.Group", b =>
                 {
                     b.Property<int>("Id")
@@ -81,6 +147,28 @@ namespace AlumniNetworkBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.GroupMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GroupMember");
                 });
 
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.Post", b =>
@@ -133,6 +221,34 @@ namespace AlumniNetworkBackend.Migrations
                     b.ToTable("Posts");
                 });
 
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.RSVP", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GuestCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RSVP");
+                });
+
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.Topic", b =>
                 {
                     b.Property<int>("Id")
@@ -150,6 +266,28 @@ namespace AlumniNetworkBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Topics");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.TopicMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TopicMember");
                 });
 
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.User", b =>
@@ -190,6 +328,66 @@ namespace AlumniNetworkBackend.Migrations
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventGroupInvite", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventTopicInvite", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventUserInvite", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.GroupMember", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.Post", b =>
@@ -235,6 +433,36 @@ namespace AlumniNetworkBackend.Migrations
                     b.Navigation("TargetTopic");
 
                     b.Navigation("TargetUser");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.RSVP", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.TopicMember", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Topic");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
