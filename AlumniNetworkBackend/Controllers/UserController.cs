@@ -22,7 +22,7 @@ namespace AlumniNetworkBackend.Controllers
             _context = context;
         }
 
-        // GET: api/Users
+        // GET: api/User
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()

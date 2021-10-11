@@ -21,11 +21,11 @@ namespace AlumniNetworkBackend.Controllers
             _context = context;
         }
 
-        // GET: api/Groups
+        // GET: api/Group
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroup()
         {
-            return await _context.Groups.ToListAsync();
+            return await _context.Groups.Where(g => !g.IsPrivate).ToListAsync();
         }
 
         // GET: api/Groups/5
