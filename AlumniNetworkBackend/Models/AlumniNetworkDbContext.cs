@@ -23,16 +23,6 @@ namespace AlumniNetworkBackend.Models
             optionsBuilder.UseSqlServer("Data Source=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
         }
 
-        public DbSet<AlumniNetworkBackend.Models.Domain.GroupMember> GroupMember { get; set; }
-
-        public DbSet<AlumniNetworkBackend.Models.Domain.EventUserInvite> EventUserInvite { get; set; }
-
-        public DbSet<AlumniNetworkBackend.Models.Domain.EventGroupInvite> EventGroupInvite { get; set; }
-
         public DbSet<AlumniNetworkBackend.Models.Domain.RSVP> RSVP { get; set; }
-
-        public DbSet<AlumniNetworkBackend.Models.Domain.EventTopicInvite> EventTopicInvite { get; set; }
-
-        public DbSet<AlumniNetworkBackend.Models.Domain.TopicMember> TopicMember { get; set; }
     }
 }

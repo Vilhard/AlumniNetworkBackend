@@ -37,6 +37,9 @@ namespace AlumniNetworkBackend.Controllers
             if (@group == null)
             {
                 return NotFound();
+            } else if (@group.IsPrivate)
+            {
+                return new StatusCodeResult(403);
             }
 
             return @group;

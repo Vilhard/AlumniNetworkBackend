@@ -18,5 +18,8 @@ namespace AlumniNetworkBackend.Models.Domain
         public string Bio { get; set; }
         [MaxLength(200)]
         public string FunFact { get; set; }
+        public ICollection<Group> Groups { get; set; }
+        public ICollection<Topic> Topics { get; set; }
+        public ICollection<Event> Events { get; set; }
     }
 }

@@ -4,14 +4,16 @@ using AlumniNetworkBackend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AlumniNetworkBackend.Migrations
 {
     [DbContext(typeof(AlumniNetworkDbContext))]
-    partial class AlumniNetworkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211011140836_removedManualmtm")]
+    partial class removedManualmtm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,8 +34,8 @@ namespace AlumniNetworkBackend.Migrations
                     b.Property<string>("BannerImg")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasMaxLength(30)
@@ -53,7 +55,75 @@ namespace AlumniNetworkBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedById");
+
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventGroupInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("EventGroupInvite");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventTopicInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("EventTopicInvite");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventUserInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EventUserInvite");
                 });
 
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.Group", b =>
@@ -176,6 +246,28 @@ namespace AlumniNetworkBackend.Migrations
                     b.ToTable("Topics");
                 });
 
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.TopicMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TopicMember");
+                });
+
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.User", b =>
                 {
                     b.Property<int>("Id")
@@ -207,51 +299,6 @@ namespace AlumniNetworkBackend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("EventGroup", b =>
-                {
-                    b.Property<int>("EventsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GroupsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EventsId", "GroupsId");
-
-                    b.HasIndex("GroupsId");
-
-                    b.ToTable("EventGroup");
-                });
-
-            modelBuilder.Entity("EventTopic", b =>
-                {
-                    b.Property<int>("EventsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TopicsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EventsId", "TopicsId");
-
-                    b.HasIndex("TopicsId");
-
-                    b.ToTable("EventTopic");
-                });
-
-            modelBuilder.Entity("EventUser", b =>
-                {
-                    b.Property<int>("EventsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EventsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("EventUser");
-                });
-
             modelBuilder.Entity("GroupUser", b =>
                 {
                     b.Property<int>("GroupsId")
@@ -267,19 +314,58 @@ namespace AlumniNetworkBackend.Migrations
                     b.ToTable("GroupUser");
                 });
 
-            modelBuilder.Entity("TopicUser", b =>
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.Event", b =>
                 {
-                    b.Property<int>("TopicsId")
-                        .HasColumnType("int");
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
 
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
+                    b.Navigation("CreatedBy");
+                });
 
-                    b.HasKey("TopicsId", "UsersId");
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventGroupInvite", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
 
-                    b.HasIndex("UsersId");
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId");
 
-                    b.ToTable("TopicUser");
+                    b.Navigation("Event");
+
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventTopicInvite", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.EventUserInvite", b =>
+                {
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.Post", b =>
@@ -342,49 +428,19 @@ namespace AlumniNetworkBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("EventGroup", b =>
+            modelBuilder.Entity("AlumniNetworkBackend.Models.Domain.TopicMember", b =>
                 {
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", null)
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.Topic", "Topic")
                         .WithMany()
-                        .HasForeignKey("EventsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TopicId");
 
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.Group", null)
+                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", "User")
                         .WithMany()
-                        .HasForeignKey("GroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                        .HasForeignKey("UserId");
 
-            modelBuilder.Entity("EventTopic", b =>
-                {
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Topic");
 
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.Topic", null)
-                        .WithMany()
-                        .HasForeignKey("TopicsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EventUser", b =>
-                {
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GroupUser", b =>
@@ -392,21 +448,6 @@ namespace AlumniNetworkBackend.Migrations
                     b.HasOne("AlumniNetworkBackend.Models.Domain.Group", null)
                         .WithMany()
                         .HasForeignKey("GroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TopicUser", b =>
-                {
-                    b.HasOne("AlumniNetworkBackend.Models.Domain.Topic", null)
-                        .WithMany()
-                        .HasForeignKey("TopicsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
