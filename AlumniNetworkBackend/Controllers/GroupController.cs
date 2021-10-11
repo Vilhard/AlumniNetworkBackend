@@ -12,47 +12,47 @@ namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TopicsController : ControllerBase
+    public class GroupController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
 
-        public TopicsController(AlumniNetworkDbContext context)
+        public GroupController(AlumniNetworkDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Topics
+        // GET: api/Groups
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Topic>>> GetTopics()
+        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
         {
-            return await _context.Topics.ToListAsync();
+            return await _context.Groups.ToListAsync();
         }
 
-        // GET: api/Topics/5
+        // GET: api/Groups/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Topic>> GetTopic(int id)
+        public async Task<ActionResult<Group>> GetGroup(int id)
         {
-            var topic = await _context.Topics.FindAsync(id);
+            var @group = await _context.Groups.FindAsync(id);
 
-            if (topic == null)
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            return topic;
+            return @group;
         }
 
-        // PUT: api/Topics/5
+        // PUT: api/Groups/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTopic(int id, Topic topic)
+        public async Task<IActionResult> PutGroup(int id, Group @group)
         {
-            if (id != topic.Id)
+            if (id != @group.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(topic).State = EntityState.Modified;
+            _context.Entry(@group).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace AlumniNetworkBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TopicExists(id))
+                if (!GroupExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace AlumniNetworkBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/Topics
+        // POST: api/Groups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Topic>> PostTopic(Topic topic)
+        public async Task<ActionResult<Group>> PostGroup(Group @group)
         {
-            _context.Topics.Add(topic);
+            _context.Groups.Add(@group);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTopic", new { id = topic.Id }, topic);
+            return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
         }
 
-        // DELETE: api/Topics/5
+        // DELETE: api/Groups/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTopic(int id)
+        public async Task<IActionResult> DeleteGroup(int id)
         {
-            var topic = await _context.Topics.FindAsync(id);
-            if (topic == null)
+            var @group = await _context.Groups.FindAsync(id);
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            _context.Topics.Remove(topic);
+            _context.Groups.Remove(@group);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TopicExists(int id)
+        private bool GroupExists(int id)
         {
-            return _context.Topics.Any(e => e.Id == id);
+            return _context.Groups.Any(e => e.Id == id);
         }
     }
 }

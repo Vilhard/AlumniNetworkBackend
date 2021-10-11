@@ -12,47 +12,47 @@ namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RSVPsController : ControllerBase
+    public class PostController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
 
-        public RSVPsController(AlumniNetworkDbContext context)
+        public PostController(AlumniNetworkDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/RSVPs
+        // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RSVP>>> GetRSVP()
+        public async Task<ActionResult<IEnumerable<Post>>> GetPosts()
         {
-            return await _context.RSVP.ToListAsync();
+            return await _context.Posts.ToListAsync();
         }
 
-        // GET: api/RSVPs/5
+        // GET: api/Posts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<RSVP>> GetRSVP(int id)
+        public async Task<ActionResult<Post>> GetPost(int id)
         {
-            var rSVP = await _context.RSVP.FindAsync(id);
+            var post = await _context.Posts.FindAsync(id);
 
-            if (rSVP == null)
+            if (post == null)
             {
                 return NotFound();
             }
 
-            return rSVP;
+            return post;
         }
 
-        // PUT: api/RSVPs/5
+        // PUT: api/Posts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRSVP(int id, RSVP rSVP)
+        public async Task<IActionResult> PutPost(int id, Post post)
         {
-            if (id != rSVP.Id)
+            if (id != post.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(rSVP).State = EntityState.Modified;
+            _context.Entry(post).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace AlumniNetworkBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RSVPExists(id))
+                if (!PostExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace AlumniNetworkBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/RSVPs
+        // POST: api/Posts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<RSVP>> PostRSVP(RSVP rSVP)
+        public async Task<ActionResult<Post>> PostPost(Post post)
         {
-            _context.RSVP.Add(rSVP);
+            _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRSVP", new { id = rSVP.Id }, rSVP);
+            return CreatedAtAction("GetPost", new { id = post.Id }, post);
         }
 
-        // DELETE: api/RSVPs/5
+        // DELETE: api/Posts/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRSVP(int id)
+        public async Task<IActionResult> DeletePost(int id)
         {
-            var rSVP = await _context.RSVP.FindAsync(id);
-            if (rSVP == null)
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null)
             {
                 return NotFound();
             }
 
-            _context.RSVP.Remove(rSVP);
+            _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool RSVPExists(int id)
+        private bool PostExists(int id)
         {
-            return _context.RSVP.Any(e => e.Id == id);
+            return _context.Posts.Any(e => e.Id == id);
         }
     }
 }

@@ -7,52 +7,54 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GroupsController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
 
-        public GroupsController(AlumniNetworkDbContext context)
+        public UserController(AlumniNetworkDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Groups
+        // GET: api/Users
+        [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Groups.ToListAsync();
+            return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Groups/5
+        // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Group>> GetGroup(int id)
+        public async Task<ActionResult<User>> GetUser(int id)
         {
-            var @group = await _context.Groups.FindAsync(id);
+            var user = await _context.Users.FindAsync(id);
 
-            if (@group == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return @group;
+            return user;
         }
 
-        // PUT: api/Groups/5
+        // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGroup(int id, Group @group)
+        public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != @group.Id)
+            if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(@group).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +62,7 @@ namespace AlumniNetworkBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!GroupExists(id))
+                if (!UserExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +75,36 @@ namespace AlumniNetworkBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/Groups
+        // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(Group @group)
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Groups.Add(@group);
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-        // DELETE: api/Groups/5
+        // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGroup(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            var @group = await _context.Groups.FindAsync(id);
-            if (@group == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Groups.Remove(@group);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool GroupExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.Groups.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }

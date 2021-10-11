@@ -12,11 +12,11 @@ namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsController : ControllerBase
+    public class EventController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
 
-        public EventsController(AlumniNetworkDbContext context)
+        public EventController(AlumniNetworkDbContext context)
         {
             _context = context;
         }
