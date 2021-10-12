@@ -11,7 +11,6 @@ namespace AlumniNetworkBackend.Models.Domain
     {
         public DateTime LastUpdated { get; set; }
         // TODO: CREATEDBY SHOULD BE FOREIGN KEY FOR USER...Waiting for maikka response
-        public string CreatedBy { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         [MaxLength(30)]
@@ -20,8 +19,10 @@ namespace AlumniNetworkBackend.Models.Domain
         public string BannerImg { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public ICollection<Topic> Topics { get; set; }
+        public int CreatedById { get; set; }
+        public User User { get; set; }
         public ICollection<User> Users { get; set; }
+        public ICollection<Topic> Topics { get; set; }
         public ICollection<Group> Groups { get; set; }
     }
 }

@@ -269,3 +269,6 @@ C:\Users\ville.hotakainen\Desktop\AlumniNetwork\AlumniNetworkBackend\AlumniNetwo
 C:\Users\ville.hotakainen\Desktop\AlumniNetwork\AlumniNetworkBackend\AlumniNetworkBackend\obj\Debug\net5.0\ref\AlumniNetworkBackend.dll
 C:\Users\ville.hotakainen\Desktop\AlumniNetwork\AlumniNetworkBackend\AlumniNetworkBackend\obj\Debug\net5.0\AlumniNetworkBackend.pdb
 C:\Users\ville.hotakainen\Desktop\AlumniNetwork\AlumniNetworkBackend\AlumniNetworkBackend\obj\Debug\net5.0\AlumniNetworkBackend.genruntimeconfig.cache
+C:\Users\omar.el.tokhy\Assignments\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\AutoMapper.dll
+C:\Users\omar.el.tokhy\Assignments\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\omar.el.tokhy\Assignments\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
