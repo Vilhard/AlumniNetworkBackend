@@ -84,7 +84,7 @@ namespace AlumniNetworkBackend.Controllers
             _context.Groups.Add(@group);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
+            return CreatedAtAction("GetGroup", new { id = @group.Id, }, @group);
         }
 
         // DELETE: api/Groups/5

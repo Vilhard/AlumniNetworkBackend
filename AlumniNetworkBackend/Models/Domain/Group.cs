@@ -14,7 +14,7 @@ namespace AlumniNetworkBackend.Models.Domain
         public string Description { get; set; }
         [MaxLength(300)]
         public bool IsPrivate { get; set; }
-        public ICollection<User> Users { get; set; }
+        public ICollection<User> Members { get; set; }
         public ICollection<Event> Events { get; set; }
     }
 }

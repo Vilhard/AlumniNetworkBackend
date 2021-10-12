@@ -272,3 +272,5 @@ C:\Users\ville.hotakainen\Desktop\AlumniNetwork\AlumniNetworkBackend\AlumniNetwo
 C:\Users\omar.el.tokhy\Assignments\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\AutoMapper.dll
 C:\Users\omar.el.tokhy\Assignments\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\omar.el.tokhy\Assignments\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\ville.hotakainen\Desktop\AlumniNetwork\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\AutoMapper.dll
+C:\Users\ville.hotakainen\Desktop\AlumniNetwork\AlumniNetworkBackend\AlumniNetworkBackend\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
