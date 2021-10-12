@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AlumniNetworkBackend.Models.DTO.GroupDTO;
+using AutoMapper;
+using System.Text.RegularExpressions;
 
 namespace AlumniNetworkBackend.Profiles
 {
-    public class GroupProfile
+    public class GroupProfile: Profile
     {
+        public GroupProfile()
+        {
+            CreateMap<Group, GroupReadDTO>();
+        }
     }
 }

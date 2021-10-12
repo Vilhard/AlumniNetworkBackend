@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
+using AutoMapper;
+using AlumniNetworkBackend.Models.DTO.GroupDTO;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -15,22 +17,29 @@ namespace AlumniNetworkBackend.Controllers
     public class GroupController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
+        private readonly IMapper _mapper;
 
-        public GroupController(AlumniNetworkDbContext context)
+        public GroupController(AlumniNetworkDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Group
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Group>>> GetGroup()
+        public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
-            return await _context.Groups.Where(g => !g.IsPrivate).ToListAsync();
+            List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
+                .Any(user => user.Name == HttpContext.User.Identity.Name))
+                .Where(g => g.IsPrivate == false)
+                .ToListAsync();
+
+            return _mapper.Map<List<GroupReadDTO>>(filteredGroupList);
         }
 
         // GET: api/Groups/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Group>> GetGroup(int id)
+        public async Task<ActionResult<GroupReadDTO>> GetGroup(int id)
         {
             var @group = await _context.Groups.FindAsync(id);
 
@@ -42,7 +51,7 @@ namespace AlumniNetworkBackend.Controllers
                 return new StatusCodeResult(403);
             }
 
-            return @group;
+            return _mapper.Map<GroupReadDTO>(@group);
         }
 
         // PUT: api/Groups/5
