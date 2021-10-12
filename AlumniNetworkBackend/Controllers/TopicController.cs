@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
+using AutoMapper;
+using AlumniNetworkBackend.Models.DTO.TopicDTO;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -15,31 +17,42 @@ namespace AlumniNetworkBackend.Controllers
     public class TopicController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TopicController(AlumniNetworkDbContext context)
+        public TopicController(AlumniNetworkDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Topics
+        /// <summary>
+        /// Endpoint api/Topics which returns a list of topics and their
+        /// descriptions
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Topic>>> GetTopics()
+        public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
-            return await _context.Topics.ToListAsync();
+            return _mapper.Map<List<TopicReadDTO>>(await _context.Topics.ToListAsync());
         }
 
-        // GET: api/Topics/5
+        /// <summary>
+        /// Endpoint api/Topics/{id} which returns a specific topic
+        /// and its description
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Topic>> GetTopic(int id)
+        public async Task<ActionResult<TopicReadDTO>> GetTopic(int id)
         {
-            var topic = await _context.Topics.FindAsync(id);
+            Topic topic = await _context.Topics.FindAsync(id);
 
             if (topic == null)
             {
                 return NotFound();
             }
 
-            return topic;
+            return _mapper.Map<TopicReadDTO>(topic);
         }
 
         // PUT: api/Topics/5
