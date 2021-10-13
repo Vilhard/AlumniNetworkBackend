@@ -20,7 +20,7 @@ namespace AlumniNetworkBackend.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=5CG05206QY\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
+            optionsBuilder.UseSqlServer("Data Source=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
         }
 
         public DbSet<AlumniNetworkBackend.Models.Domain.RSVP> RSVP { get; set; }

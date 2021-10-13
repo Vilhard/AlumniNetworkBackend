@@ -9,6 +9,12 @@ using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
 using AutoMapper;
 using AlumniNetworkBackend.Models.DTO.GroupDTO;
+using AlumniNetworkBackend.Models.DTO.UserDTO;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -24,11 +30,12 @@ namespace AlumniNetworkBackend.Controllers
             _context = context;
             _mapper = mapper;
         }
-
         // GET: api/Group
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
+            var token = await HttpContext.GetTokenAsync("access_token");
             List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
                 .Any(user => user.Name == HttpContext.User.Identity.Name))
                 .Where(g => g.IsPrivate == false)
@@ -90,12 +97,15 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Groups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(Group @group)
+        public async Task<ActionResult<Group>> PostGroup(GroupCreateDTO @group)
         {
-            _context.Groups.Add(@group);
+            var creator = HttpContext.User.Identity;
+            Group domainGroup = _mapper.Map<Group>(@group);
+            domainGroup.Members.Add((User)creator);
+            _context.Groups.Add(domainGroup);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGroup", new { id = @group.Id, }, @group);
+            return CreatedAtAction("GetGroup", new { id = domainGroup.Id, }, _mapper.Map<GroupReadDTO>(@group));
         }
 
         // DELETE: api/Groups/5

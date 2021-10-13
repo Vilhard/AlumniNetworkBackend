@@ -20,7 +20,7 @@ namespace AlumniNetworkBackend.Models.Domain
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int CreatedById { get; set; }
-        public User User { get; set; }
+        public string User { get; set; }
         public ICollection<User> Users { get; set; }
         public ICollection<Topic> Topics { get; set; }
         public ICollection<Group> Groups { get; set; }
