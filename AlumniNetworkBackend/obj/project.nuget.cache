@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "RGPIBVPjLT0N3Ltu1bta3Pq8eibIpEd/99xpACk453uElMCsDmqbhkFgnHTh8smvgMbjBBKvWSY+5OaUBsCwkg==",
+  "dgSpecHash": "vcJAOOgqhEY8erf3E+lI/N6KS78lsI78r3Q5SI/tFjJzBhpKPH5fV5IeybtnJttDPQePRbTumd0f9k3TA7HJmA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\ville.hotakainen\\Desktop\\AlumniNetwork\\AlumniNetworkBackend\\AlumniNetworkBackend\\AlumniNetworkBackend.csproj",
+  "projectFilePath": "C:\\Users\\ville.hotakainen\\Desktop\\bäkki\\AlumniNetworkBackend\\AlumniNetworkBackend\\AlumniNetworkBackend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ville.hotakainen\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\ville.hotakainen\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
