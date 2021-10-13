@@ -42,15 +42,17 @@ namespace AlumniNetworkBackend.Controllers
         public async Task<ActionResult<GroupReadDTO>> GetGroup(int id)
         {
             var @group = await _context.Groups.FindAsync(id);
+            var isNotMember = @group.Members.Where(u => u.Name == HttpContext.User.Identity.Name).Equals(false);
+            var isPrivate = @group.IsPrivate.Equals(true);
 
             if (@group == null)
             {
                 return NotFound();
-            } else if (@group.IsPrivate)
+            }
+            else if (isNotMember && isPrivate)
             {
                 return new StatusCodeResult(403);
             }
-
             return _mapper.Map<GroupReadDTO>(@group);
         }
 
