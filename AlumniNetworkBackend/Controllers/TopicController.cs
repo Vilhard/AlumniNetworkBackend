@@ -86,6 +86,22 @@ namespace AlumniNetworkBackend.Controllers
             return NoContent();
         }
 
+        // <summary>
+        /// Endpoint api/Topics which posts a new Topic to database with name
+        /// and description.
+        /// </summary>
+        /// <param name="dtoTopic"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<TopicCreateDTO>> PostTopic(TopicCreateDTO dtoTopic)
+        {
+            Topic domainTopic = _mapper.Map<Topic>(dtoTopic);
+            _context.Topics.Add(domainTopic);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetTopic", new { id = domainTopic.Id }, domainTopic);
+        }
+
         // POST: api/Topics
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
