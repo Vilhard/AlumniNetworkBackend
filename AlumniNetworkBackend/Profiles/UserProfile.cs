@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AlumniNetworkBackend.Models.Domain;
+using AlumniNetworkBackend.Models.DTO.UserDTO;
+using AutoMapper;
 
 namespace AlumniNetworkBackend.Profiles
 {
-    public class UserProfile
+    public class UserProfile : Profile
     {
+        public UserProfile()
+        {
+            CreateMap<User, UserReadDTO>().ReverseMap();
+        }
     }
 }

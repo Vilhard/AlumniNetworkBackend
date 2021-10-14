@@ -12,6 +12,7 @@ namespace AlumniNetworkBackend.Models.Domain
         [MaxLength(20)]
         public string Name { get; set; }
         [MaxLength(40)]
+        public string Username { get; set; }
         public string Picture { get; set; }
         public string Status { get; set; }
         [MaxLength(100)]

@@ -59,6 +59,7 @@ namespace AlumniNetworkBackend
 
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers();
+            // TODO: Adding service that pushes the user to db
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AlumniNetworkBackend", Version = "v1" });

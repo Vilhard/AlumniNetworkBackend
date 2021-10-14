@@ -8,9 +8,6 @@ namespace AlumniNetworkBackend.Models.DTO
     public class UserCreateDTO
     {
         public string Name { get; set; }
-        public string Picture { get; set; }
-        public string Status { get; set; }
-        public string Bio { get; set; }
-        public string FunFact { get; set; }
+        public string Username { get; set; }
     }
 }
