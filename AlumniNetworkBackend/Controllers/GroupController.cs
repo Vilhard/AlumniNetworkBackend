@@ -33,14 +33,6 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
-            //Extra: Used for token testing endpoint
-            var token = await HttpContext.GetTokenAsync("access_token");
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token);
-            var tokenS = jsonToken as JwtSecurityToken;
-            var givenName = tokenS.Claims.First(claim => claim.Type == "name").Value;
-            var givenUsername = tokenS.Claims.First(claim => claim.Type == "preferred_username").Value;
-
             List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
                 .Any(user => user.Name == HttpContext.User.Identity.Name))
                 .Where(g => g.IsPrivate == false)

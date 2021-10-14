@@ -24,6 +24,5 @@ namespace AlumniNetworkBackend.Models
         }
 
         public DbSet<AlumniNetworkBackend.Models.Domain.RSVP> RSVP { get; set; }
-        public IEnumerable<object> GroupReadDTO { get; internal set; }
     }
 }

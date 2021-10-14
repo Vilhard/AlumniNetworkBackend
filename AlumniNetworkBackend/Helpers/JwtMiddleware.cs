@@ -29,9 +29,9 @@ namespace AlumniNetworkBackend.Helpers
         {
             var token = await context.GetTokenAsync("access_token");
             if (token != null) 
-                AttachUserToContext(context,_dbcontext, token);
+                AttachUserToContext(_dbcontext, token);
         }
-        public async void AttachUserToContext(HttpContext context, AlumniNetworkDbContext _dbcontext, string token)
+        public async void AttachUserToContext(AlumniNetworkDbContext _dbcontext, string token)
         {
             try
             {
@@ -49,9 +49,7 @@ namespace AlumniNetworkBackend.Helpers
                 };
 
                 User user = _mapper.Map<User>(dto);
-                _dbcontext.Users.Add(user);
                 await _dbcontext.SaveChangesAsync();
-                //return CreatedAtRouteResult("GetUser", new { id = user.Id, name = user.Name, username = user.Username }, _mapper.Map<UserReadDTO>(dto));
             }
             catch
             {

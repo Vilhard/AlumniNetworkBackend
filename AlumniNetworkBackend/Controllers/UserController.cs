@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using System.IdentityModel.Tokens.Jwt;
+using AutoMapper;
+using AlumniNetworkBackend.Models.DTO;
+using AlumniNetworkBackend.Models.DTO.UserDTO;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -16,10 +21,12 @@ namespace AlumniNetworkBackend.Controllers
     public class UserController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UserController(AlumniNetworkDbContext context)
+        public UserController(AlumniNetworkDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/User
@@ -78,12 +85,25 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<User>> PostUser()
         {
-            _context.Users.Add(user);
+            var token = await HttpContext.GetTokenAsync("access_token");
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token);
+            var tokenS = jsonToken as JwtSecurityToken;
+            string givenName = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            string givenUsername = tokenS.Claims.First(claim => claim.Type == "preferred_username").Value;
+
+            var user = new User
+            {
+                Name = givenName,
+                Username = givenUsername
+            };
+            User domainUser = _mapper.Map<User>(user);
+            _context.Users.Add(domainUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return CreatedAtAction("GetUser", new { id = user.Id}, _mapper.Map<UserReadDTO>(domainUser));
         }
 
         // DELETE: api/Users/5
