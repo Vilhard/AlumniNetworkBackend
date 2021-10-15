@@ -85,25 +85,25 @@ namespace AlumniNetworkBackend.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<User>> PostUser()
+        public async Task<ActionResult<User>> PostUser(UserCreateDTO dtoUser)
         {
-            var token = await HttpContext.GetTokenAsync("access_token");
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token);
-            var tokenS = jsonToken as JwtSecurityToken;
-            string givenName = tokenS.Claims.First(claim => claim.Type == "name").Value;
-            string givenUsername = tokenS.Claims.First(claim => claim.Type == "preferred_username").Value;
+            //var token = await HttpContext.GetTokenAsync("access_token");
+            //var handler = new JwtSecurityTokenHandler();
+            //var jsonToken = handler.ReadToken(token);
+            //var tokenS = jsonToken as JwtSecurityToken;
+            //string givenName = tokenS.Claims.First(claim => claim.Type == "name").Value;
+            //string givenUsername = tokenS.Claims.First(claim => claim.Type == "preferred_username").Value;
 
-            var user = new User
-            {
-                Name = givenName,
-                Username = givenUsername
-            };
-            User domainUser = _mapper.Map<User>(user);
+            //var user = new User
+            //{
+            //    Name = givenName,
+            //    Username = givenUsername
+            //};
+            User domainUser = _mapper.Map<User>(dtoUser);
             _context.Users.Add(domainUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id}, _mapper.Map<UserReadDTO>(domainUser));
+            return CreatedAtAction("GetUser", new { id = domainUser.Id}, _mapper.Map<UserReadDTO>(domainUser));
         }
 
         // DELETE: api/Users/5

@@ -45,19 +45,21 @@ namespace AlumniNetworkBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GroupReadDTO>> GetGroup(int id)
         {
-            var @group = await _context.Groups.FindAsync(id);
-            var isNotMember = @group.Members.Where(u => u.Name == HttpContext.User.Identity.Name).Equals(false);
-            var isPrivate = @group.IsPrivate.Equals(true);
+            System.Diagnostics.Debug.Write(HttpContext.User.Identity.Name);
+            Group domainGroup = await _context.Groups.FindAsync(id);
+            //var isNotMember = domainGroup.Members.Where(u => u.Username == HttpContext.User.Identity.Name).Equals(false);
+            //var isPrivate = domainGroup.IsPrivate.Equals(true);
 
-            if (@group == null)
+            if (domainGroup == null)
             {
                 return NotFound();
             }
-            else if (isNotMember && isPrivate)
-            {
-                return new StatusCodeResult(403);
-            }
-            return _mapper.Map<GroupReadDTO>(@group);
+            //else if (isNotMember && isPrivate)
+            //{
+            //    return new StatusCodeResult(403);
+            //}
+
+            return _mapper.Map<GroupReadDTO>(domainGroup);
         }
 
         // PUT: api/Groups/5
@@ -94,15 +96,13 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Groups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(GroupCreateDTO @group)
+        public async Task<ActionResult<Group>> PostGroup(GroupCreateDTO dtoGroup)
         {
-            var creator = HttpContext.User.Identity;
-            Group domainGroup = _mapper.Map<Group>(@group);
-            domainGroup.Members.Add((User)creator);
+            Group domainGroup = _mapper.Map<Group>(dtoGroup);
             _context.Groups.Add(domainGroup);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGroup", new { id = domainGroup.Id, }, _mapper.Map<GroupReadDTO>(@group));
+            return CreatedAtAction("GetGroup", new { id = domainGroup.Id, }, _mapper.Map<GroupReadDTO>(domainGroup));
         }
 
         // DELETE: api/Groups/5

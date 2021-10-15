@@ -17,12 +17,13 @@ namespace AlumniNetworkBackend.Models
         public DbSet<Event> Events { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Post> Posts { get; set; }
-
+       
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
         }
 
         public DbSet<AlumniNetworkBackend.Models.Domain.RSVP> RSVP { get; set; }
+
     }
 }
