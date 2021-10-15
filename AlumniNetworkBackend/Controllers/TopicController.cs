@@ -104,14 +104,14 @@ namespace AlumniNetworkBackend.Controllers
 
         // POST: api/Topics
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Topic>> PostTopic(Topic topic)
-        {
-            _context.Topics.Add(topic);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<Topic>> PostTopic(Topic topic)
+        //{
+        //    _context.Topics.Add(topic);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTopic", new { id = topic.Id }, topic);
-        }
+        //    return CreatedAtAction("GetTopic", new { id = topic.Id }, topic);
+        //}
 
         // DELETE: api/Topics/5
         [HttpDelete("{id}")]

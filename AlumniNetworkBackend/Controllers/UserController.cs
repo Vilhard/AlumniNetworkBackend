@@ -13,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using AlumniNetworkBackend.Models.DTO;
 using AlumniNetworkBackend.Models.DTO.UserDTO;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -30,8 +31,8 @@ namespace AlumniNetworkBackend.Controllers
         }
 
         // GET: api/User
-        [Authorize]
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
@@ -39,32 +40,34 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<UserReadDTO>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            User user = await _context.Users.FindAsync(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return _mapper.Map<UserReadDTO>(user);
         }
 
         // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> PutUser(int id, UserUpdateDTO dtoUser)
         {
-            if (id != user.Id)
+            if (id != dtoUser.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
-
             try
             {
+                User domainUser = _mapper.Map<User>(dtoUser);
+                _context.Entry(domainUser).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -72,10 +75,6 @@ namespace AlumniNetworkBackend.Controllers
                 if (!UserExists(id))
                 {
                     return NotFound();
-                }
-                else
-                {
-                    throw;
                 }
             }
 
@@ -85,6 +84,7 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<User>> PostUser()
         {
             var token = await HttpContext.GetTokenAsync("access_token");
