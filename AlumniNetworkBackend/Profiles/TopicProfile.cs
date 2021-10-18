@@ -23,6 +23,10 @@ namespace AlumniNetworkBackend.Profiles
             //Map topic model to update DTO
             CreateMap<Topic, TopicUpdateDTO>()
                 .ReverseMap();
+
+            //Map topic model to topicmember create dto
+            CreateMap<Topic, TopicCreateMemberDTO>()
+                .ReverseMap();
         }
     }
 }

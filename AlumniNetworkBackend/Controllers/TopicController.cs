@@ -9,6 +9,9 @@ using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
 using AutoMapper;
 using AlumniNetworkBackend.Models.DTO.TopicDTO;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -18,11 +21,13 @@ namespace AlumniNetworkBackend.Controllers
     {
         private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TopicController(AlumniNetworkDbContext context, IMapper mapper)
+        public TopicController(AlumniNetworkDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor )
         {
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -31,6 +36,7 @@ namespace AlumniNetworkBackend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
             return _mapper.Map<List<TopicReadDTO>>(await _context.Topics.ToListAsync());
@@ -43,6 +49,7 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicReadDTO>> GetTopic(int id)
         {
             Topic topic = await _context.Topics.FindAsync(id);
@@ -58,6 +65,7 @@ namespace AlumniNetworkBackend.Controllers
         // PUT: api/Topics/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PutTopic(int id, Topic topic)
         {
             if (id != topic.Id)
@@ -93,6 +101,7 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="dtoTopic"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicCreateDTO>> PostTopic(TopicCreateDTO dtoTopic)
         {
             Topic domainTopic = _mapper.Map<Topic>(dtoTopic);
@@ -103,18 +112,33 @@ namespace AlumniNetworkBackend.Controllers
         }
 
         // POST: api/Topics
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Topic>> PostTopic(Topic topic)
+        // Work in progress
+        [HttpPost("{id}/join")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Topic>> PostTopic()
         {
-            _context.Topics.Add(topic);
+            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var user = new User
+            {
+                Id = userId
+            };
+
+            var topic = new Topic
+            {
+                Users = (ICollection<User>)user
+            };
+
+            Topic domainTopic = _mapper.Map<Topic>(topic);
+            _context.Topics.Add(domainTopic);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTopic", new { id = topic.Id }, topic);
+            return CreatedAtAction("GetTopic", _mapper.Map<TopicCreateMemberDTO>(topic));
         }
 
         // DELETE: api/Topics/5
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteTopic(int id)
         {
             var topic = await _context.Topics.FindAsync(id);
