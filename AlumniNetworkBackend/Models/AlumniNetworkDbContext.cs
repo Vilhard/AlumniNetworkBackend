@@ -1,4 +1,5 @@
 ﻿using AlumniNetworkBackend.Models.Domain;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,10 @@ namespace AlumniNetworkBackend.Models
 {
     public class AlumniNetworkDbContext : DbContext
     {
-        public AlumniNetworkDbContext(DbContextOptions options) : base(options)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AlumniNetworkDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) : base(options)
         {
+            _httpContextAccessor = httpContextAccessor;
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
