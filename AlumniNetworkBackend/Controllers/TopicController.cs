@@ -117,8 +117,7 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Topic>> PostTopic()
         {
-            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
             var user = new User
             {
                 Id = userId
