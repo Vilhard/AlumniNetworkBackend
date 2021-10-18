@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
-using AlumniNetworkBackend.Models.DTO.GroupDTO;
-using AlumniNetworkBackend.Models.DTO.TopicDTO;
 using AutoMapper;
 using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.PostDTO;
@@ -80,6 +76,55 @@ namespace AlumniNetworkBackend.Controllers
             }
 
             return _mapper.Map<PostReadDirectDTO>(postsFromSpecificUser);
+        }
+
+        // GET: api/Posts/Group/:group_id
+        [HttpGet("Group/{id}")]
+        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromGroup(int id)
+        {
+            var postFromGroupAsTarget = await _context.Groups.Where(g => g.Id == id)
+                .SelectMany(p => p.Posts)
+                .Where(t => t.TargetGroup.Id == id)
+                .ToListAsync();
+
+            if (postFromGroupAsTarget == null)
+            {
+                return NotFound();
+            }
+
+            return _mapper.Map<PostReadDirectDTO>(postFromGroupAsTarget);
+        }
+        // GET: api/Posts/Topic/:topic_id
+        [HttpGet("Topic/{id}")]
+        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromTopic(int id)
+        {
+            var postFromTopicAsTarget = await _context.Topics.Where(t => t.Id == id)
+                .SelectMany(p => p.Posts)
+                .Where(tt => tt.TargetGroup.Id == id)
+                .ToListAsync();
+
+            if (postFromTopicAsTarget == null)
+            {
+                return NotFound();
+            }
+
+            return _mapper.Map<PostReadDirectDTO>(postFromTopicAsTarget);
+        }
+        // GET: api/Posts/Event/:event_id
+        [HttpGet("Event/{id}")]
+        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromEvent(int id)
+        {
+            var postFromEventAsTarget = await _context.Events.Where(e => e.Id == id)
+                .SelectMany(p => p.Posts)
+                .Where(te => te.TargetEvent.Id == id)
+                .ToListAsync();
+
+            if (postFromEventAsTarget == null)
+            { 
+                return NotFound();
+            }
+
+            return _mapper.Map<PostReadDirectDTO>(postFromEventAsTarget);
         }
 
         // PUT: api/Posts/5
