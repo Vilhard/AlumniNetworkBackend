@@ -41,7 +41,7 @@ namespace AlumniNetworkBackend.Controllers
         // GET: api/Users/5
         [HttpGet("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<UserReadDTO>> GetUser(int id)
+        public async Task<ActionResult<UserReadDTO>> GetUser(string id)
         {
             User user = await _context.Users.FindAsync(id);
 
@@ -57,7 +57,7 @@ namespace AlumniNetworkBackend.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=
         [HttpPut("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> PutUser(int id, UserUpdateDTO dtoUser)
+        public async Task<IActionResult> PutUser(string id, UserUpdateDTO dtoUser)
         {
             if (id != dtoUser.Id)
             {
@@ -87,18 +87,6 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<User>> PostUser(UserCreateDTO dtoUser)
         {
-            //var token = await HttpContext.GetTokenAsync("access_token");
-            //var handler = new JwtSecurityTokenHandler();
-            //var jsonToken = handler.ReadToken(token);
-            //var tokenS = jsonToken as JwtSecurityToken;
-            //string givenName = tokenS.Claims.First(claim => claim.Type == "name").Value;
-            //string givenUsername = tokenS.Claims.First(claim => claim.Type == "preferred_username").Value;
-
-            //var user = new User
-            //{
-            //    Name = givenName,
-            //    Username = givenUsername
-            //};
             User domainUser = _mapper.Map<User>(dtoUser);
             _context.Users.Add(domainUser);
             await _context.SaveChangesAsync();
@@ -108,7 +96,7 @@ namespace AlumniNetworkBackend.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -122,7 +110,7 @@ namespace AlumniNetworkBackend.Controllers
             return NoContent();
         }
 
-        private bool UserExists(int id)
+        private bool UserExists(string id)
         {
             return _context.Users.Any(e => e.Id == id);
         }

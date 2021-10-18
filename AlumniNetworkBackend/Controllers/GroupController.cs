@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -33,10 +34,12 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
-            List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
-                .Any(user => user.Name == HttpContext.User.Identity.Name))
-                .Where(g => g.IsPrivate == false)
-                .ToListAsync();
+            //string userId = User.FindFirstValue(ClaimTypes.Name Identifier); // will give the user's userId
+            //List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
+            //    .Any(user => user.Id == Convert.ToInt16(userId)))
+            //    .Where(g => g.IsPrivate == false)
+            //    .ToListAsync();
+            List<Group> filteredGroupList = await _context.Groups.ToListAsync();
 
             return _mapper.Map<List<GroupReadDTO>>(filteredGroupList);
         }
@@ -45,21 +48,27 @@ namespace AlumniNetworkBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GroupReadDTO>> GetGroup(int id)
         {
-            System.Diagnostics.Debug.Write(HttpContext.User.Identity.Name);
-            Group domainGroup = await _context.Groups.FindAsync(id);
-            //var isNotMember = domainGroup.Members.Where(u => u.Username == HttpContext.User.Identity.Name).Equals(false);
-            //var isPrivate = domainGroup.IsPrivate.Equals(true);
+            try
+            {
+                Group domainGroup = await _context.Groups.FindAsync(id);
+                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+                //bool isNotMember = domainGroup.Members.Where(u => u.Id == Convert.ToInt16(userId)).Equals(false);
+                //bool isPrivate = domainGroup.IsPrivate.Equals(true);
 
-            if (domainGroup == null)
+                if (domainGroup == null)
+                {
+                    return NotFound();
+                }
+                //if (isNotMember && isPrivate)
+                //{
+                //    return new StatusCodeResult(403);
+                //}
+                return _mapper.Map<GroupReadDTO>(domainGroup);
+            }
+            catch
             {
                 return NotFound();
             }
-            //else if (isNotMember && isPrivate)
-            //{
-            //    return new StatusCodeResult(403);
-            //}
-
-            return _mapper.Map<GroupReadDTO>(domainGroup);
         }
 
         // PUT: api/Groups/5

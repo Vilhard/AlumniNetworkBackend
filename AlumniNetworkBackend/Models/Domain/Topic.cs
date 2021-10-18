@@ -14,5 +14,6 @@ namespace AlumniNetworkBackend.Models.Domain
         public string Description { get; set; }
         public ICollection<User> Users { get; set; }
         public ICollection<Event> Events { get; set; }
+        public ICollection<Post> Posts { get; set; }
     }
 }
