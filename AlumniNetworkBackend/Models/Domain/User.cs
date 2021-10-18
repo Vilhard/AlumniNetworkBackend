@@ -8,11 +8,12 @@ namespace AlumniNetworkBackend.Models.Domain
 {
     public class User
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         [MaxLength(20)]
         public string Name { get; set; }
         [MaxLength(40)]
         public string Username { get; set; }
+        [MaxLength(40)]
         public string Picture { get; set; }
         public string Status { get; set; }
         [MaxLength(100)]

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -33,10 +34,12 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
-            List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
-                .Any(user => user.Name == HttpContext.User.Identity.Name))
-                .Where(g => g.IsPrivate == false)
-                .ToListAsync();
+            //string userId = User.FindFirstValue(ClaimTypes.Name Identifier); // will give the user's userId
+            //List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
+            //    .Any(user => user.Id == Convert.ToInt16(userId)))
+            //    .Where(g => g.IsPrivate == false)
+            //    .ToListAsync();
+            List<Group> filteredGroupList = await _context.Groups.ToListAsync();
 
             return _mapper.Map<List<GroupReadDTO>>(filteredGroupList);
         }
@@ -45,19 +48,27 @@ namespace AlumniNetworkBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GroupReadDTO>> GetGroup(int id)
         {
-            var @group = await _context.Groups.FindAsync(id);
-            var isNotMember = @group.Members.Where(u => u.Name == HttpContext.User.Identity.Name).Equals(false);
-            var isPrivate = @group.IsPrivate.Equals(true);
+            try
+            {
+                Group domainGroup = await _context.Groups.FindAsync(id);
+                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+                //bool isNotMember = domainGroup.Members.Where(u => u.Id == Convert.ToInt16(userId)).Equals(false);
+                //bool isPrivate = domainGroup.IsPrivate.Equals(true);
 
-            if (@group == null)
+                if (domainGroup == null)
+                {
+                    return NotFound();
+                }
+                //if (isNotMember && isPrivate)
+                //{
+                //    return new StatusCodeResult(403);
+                //}
+                return _mapper.Map<GroupReadDTO>(domainGroup);
+            }
+            catch
             {
                 return NotFound();
             }
-            else if (isNotMember && isPrivate)
-            {
-                return new StatusCodeResult(403);
-            }
-            return _mapper.Map<GroupReadDTO>(@group);
         }
 
         // PUT: api/Groups/5
@@ -94,15 +105,13 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Groups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(GroupCreateDTO @group)
+        public async Task<ActionResult<Group>> PostGroup(GroupCreateDTO dtoGroup)
         {
-            var creator = HttpContext.User.Identity;
-            Group domainGroup = _mapper.Map<Group>(@group);
-            domainGroup.Members.Add((User)creator);
+            Group domainGroup = _mapper.Map<Group>(dtoGroup);
             _context.Groups.Add(domainGroup);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGroup", new { id = domainGroup.Id, }, _mapper.Map<GroupReadDTO>(@group));
+            return CreatedAtAction("GetGroup", new { id = domainGroup.Id, }, _mapper.Map<GroupReadDTO>(domainGroup));
         }
 
         // DELETE: api/Groups/5

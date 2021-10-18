@@ -16,5 +16,6 @@ namespace AlumniNetworkBackend.Models.Domain
         public bool IsPrivate { get; set; }
         public ICollection<User> Members { get; set; }
         public ICollection<Event> Events { get; set; }
+        public ICollection<Post> Posts { get; set; }
     }
 }
