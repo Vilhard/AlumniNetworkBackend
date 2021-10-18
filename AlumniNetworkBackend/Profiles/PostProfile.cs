@@ -10,6 +10,7 @@ namespace AlumniNetworkBackend.Profiles
         {
             CreateMap<Post, PostReadDTO>().ReverseMap();
             CreateMap<Post, PostReadDirectDTO>().ReverseMap();
+            CreateMap<Post, PostCreateDTO>().ReverseMap();
         }
     }
 }

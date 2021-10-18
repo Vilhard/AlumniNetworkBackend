@@ -161,12 +161,13 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Posts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Post>> PostPost(Post post)
+        public async Task<ActionResult<PostCreateDTO>> PostPost(PostCreateDTO dtoPost)
         {
-            _context.Posts.Add(post);
+            Post domainPost = _mapper.Map<Post>(dtoPost);
+            _context.Posts.Add(domainPost);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPost", new { id = post.Id }, post);
+            return CreatedAtAction("GetPost", new { id = domainPost.Id }, _mapper.Map<PostReadCreateDTO>(domainPost));
         }
 
         // DELETE: api/Posts/5
