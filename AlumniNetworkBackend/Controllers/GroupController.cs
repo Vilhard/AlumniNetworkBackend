@@ -34,12 +34,8 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
-            //string userId = User.FindFirstValue(ClaimTypes.Name Identifier); // will give the user's userId
-            //List<Group> filteredGroupList = await _context.Groups.Where(g => g.Members
-            //    .Any(user => user.Id == Convert.ToInt16(userId)))
-            //    .Where(g => g.IsPrivate == false)
-            //    .ToListAsync();
-            List<Group> filteredGroupList = await _context.Groups.ToListAsync();
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's 
+            List<Group> filteredGroupList = await _context.Groups.Where(g => g.IsPrivate).Where(g => g.Members.Any(u => u.Id != userId)).ToListAsync();
 
             return _mapper.Map<List<GroupReadDTO>>(filteredGroupList);
         }
@@ -51,18 +47,16 @@ namespace AlumniNetworkBackend.Controllers
             try
             {
                 Group domainGroup = await _context.Groups.FindAsync(id);
-                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-                //bool isNotMember = domainGroup.Members.Where(u => u.Id == Convert.ToInt16(userId)).Equals(false);
-                //bool isPrivate = domainGroup.IsPrivate.Equals(true);
-
+                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's 
+                bool IsNotMember = domainGroup.Members.Where(u => u.Id != userId).Equals(true);
                 if (domainGroup == null)
                 {
                     return NotFound();
                 }
-                //if (isNotMember && isPrivate)
-                //{
-                //    return new StatusCodeResult(403);
-                //}
+                if (domainGroup.IsPrivate && IsNotMember)
+                {
+                    return new StatusCodeResult(403);
+                }
                 return _mapper.Map<GroupReadDTO>(domainGroup);
             }
             catch
@@ -114,7 +108,7 @@ namespace AlumniNetworkBackend.Controllers
             _context.Groups.Add(domainGroup);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGroup", new { id = domainGroup.Id, }, _mapper.Map<GroupReadDTO>(domainGroup));
+            return CreatedAtAction("GetGroup", new { name = domainGroup.Name, }, _mapper.Map<GroupReadDTO>(domainGroup));
         }
 
         // DELETE: api/Groups/5

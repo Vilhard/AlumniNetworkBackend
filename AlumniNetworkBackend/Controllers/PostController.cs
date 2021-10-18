@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
+using AlumniNetworkBackend.Models.DTO.GroupDTO;
+using AlumniNetworkBackend.Models.DTO.TopicDTO;
+using AutoMapper;
+using System.Security.Claims;
+using AlumniNetworkBackend.Models.DTO.PostDTO;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -15,31 +20,66 @@ namespace AlumniNetworkBackend.Controllers
     public class PostController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
+        private readonly IMapper _mapper;
 
-        public PostController(AlumniNetworkDbContext context)
+        public PostController(AlumniNetworkDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> GetPosts()
+        public async Task<ActionResult<PostReadDTO>> GeUserGroupAndTopicPosts()
         {
-            return await _context.Posts.ToListAsync();
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            var userIsGroupMember = await _context.Groups.Where(g => g.Members.Any(u => u.Id == userId)).ToListAsync();
+            List<Post> GroupPosts = userIsGroupMember.SelectMany(p => p.Posts).ToList();
+
+            var userIsTopicMember = await _context.Topics.Where(t => t.Users.Any(u => u.Id == userId)).ToListAsync();
+            List<Post> TopicPosts = userIsTopicMember.SelectMany(p => p.Posts).ToList();
+
+            var filteredPostList = new 
+            {
+                GroupPosts,
+                TopicPosts
+            };
+
+            return _mapper.Map<PostReadDTO>(filteredPostList);
         }
-
-        // GET: api/Posts/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Post>> GetPost(int id)
+        // GET: api/Posts/user
+        [HttpGet("/user")]
+        public async Task<ActionResult<PostReadDirectDTO>> GetUserDirectPost()
         {
-            var post = await _context.Posts.FindAsync(id);
-
-            if (post == null)
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            var userPosts = await _context.Users.Where(u => u.Id == userId)
+                .SelectMany(p => p.Posts)
+                .Where(t => t.TargetUser.Id == userId)
+                .ToListAsync();
+            if (userPosts == null)
             {
                 return NotFound();
             }
 
-            return post;
+            return _mapper.Map<PostReadDirectDTO>(userPosts);
+        }
+
+        // GET: api/Posts/user/user_id
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromUser (string id)
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            var postsFromSpecificUser = await _context.Users.Where(u => u.Id == userId)
+                .SelectMany(p => p.Posts)
+                .Where(t => t.SenderId.Id == id)
+                .ToListAsync();
+                
+            if (postsFromSpecificUser == null)
+            {
+                return NotFound();
+            }
+
+            return _mapper.Map<PostReadDirectDTO>(postsFromSpecificUser);
         }
 
         // PUT: api/Posts/5
