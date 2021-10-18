@@ -14,6 +14,6 @@ namespace AlumniNetworkBackend.Models.DTO.UserDTO
         public string Status { get; set; }
         public string Bio { get; set; }
         public string FunFact { get; set; }
-
+        public List<object> Members { get; set; }
     }
 }

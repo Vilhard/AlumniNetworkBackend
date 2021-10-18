@@ -9,9 +9,9 @@ namespace AlumniNetworkBackend.Profiles
         public GroupProfile()
         {
             CreateMap<Group, GroupReadDTO>().ReverseMap();
-                //.ForMember(gdto => gdto.Members, opt => opt
-                //.MapFrom(g => g.Members.Select(g => g.Id).ToArray());
-            CreateMap<Group, GroupCreateDTO>().ReverseMap();
+            //.ForMember(gdto => gdto.Members, opt => opt
+            //.MapFrom(g => g.Members.Select(g => g.Id).ToArray());
+            CreateMap<GroupCreateDTO, Group>().ReverseMap();
         }
     }
 }

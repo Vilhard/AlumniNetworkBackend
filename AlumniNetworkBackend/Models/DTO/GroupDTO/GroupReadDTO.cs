@@ -13,6 +13,6 @@ namespace AlumniNetworkBackend.Models.DTO.GroupDTO
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsPrivate { get; set; }
-        public List<int> Members { get; set; }
+        public List<object> Members { get; set; }
     }
 }

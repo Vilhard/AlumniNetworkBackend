@@ -107,7 +107,10 @@ namespace AlumniNetworkBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<Group>> PostGroup(GroupCreateDTO dtoGroup)
         {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            User creator = await _context.Users.FindAsync(userId);
             Group domainGroup = _mapper.Map<Group>(dtoGroup);
+            domainGroup.Members.Add(creator);
             _context.Groups.Add(domainGroup);
             await _context.SaveChangesAsync();
 
