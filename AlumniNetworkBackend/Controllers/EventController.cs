@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
+using AutoMapper;
+using System.Security.Claims;
+using AlumniNetworkBackend.Models.DTO.EventDTO;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -15,17 +18,43 @@ namespace AlumniNetworkBackend.Controllers
     public class EventController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
+        private readonly IMapper _mapper;
 
-        public EventController(AlumniNetworkDbContext context)
+        public EventController(AlumniNetworkDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Events
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<EventForUserReadDTO>> GetEvents()
         {
-            return await _context.Events.ToListAsync();
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var userBelongsToGroup = await _context.Groups
+                .Where(g => g.Members.Any(u => u.Id == userId))
+                .ToListAsync();
+
+            List<Event> GroupEvents = userBelongsToGroup
+                .SelectMany(e => e.Event)
+                .ToList();
+
+            var userBelongsToTopic = await _context.Topics
+                .Where(t => t.Users.Any(u => u.Id == userId))
+                .ToListAsync();
+
+            List<Event> TopicEvents = userBelongsToTopic
+                .SelectMany(e => e.Event)
+                .ToList();
+
+            var eventsForGroupsAndTopics = new
+            {
+                TopicEvents,
+                GroupEvents
+            };
+
+            return _mapper.Map<EventForUserReadDTO>(eventsForGroupsAndTopics);
         }
 
         // GET: api/Events/5
