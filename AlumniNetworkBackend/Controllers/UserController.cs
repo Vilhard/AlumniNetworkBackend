@@ -88,6 +88,7 @@ namespace AlumniNetworkBackend.Controllers
         public async Task<ActionResult<User>> PostUser(UserCreateDTO dtoUser)
         {
             User domainUser = _mapper.Map<User>(dtoUser);
+
             _context.Users.Add(domainUser);
             await _context.SaveChangesAsync();
 

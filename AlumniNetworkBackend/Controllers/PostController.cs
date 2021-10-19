@@ -8,6 +8,7 @@ using AlumniNetworkBackend.Models.Domain;
 using AutoMapper;
 using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.PostDTO;
+using AlumniNetworkBackend.Services;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -17,11 +18,13 @@ namespace AlumniNetworkBackend.Controllers
     {
         private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPostService _postService;
 
-        public PostController(AlumniNetworkDbContext context, IMapper mapper)
+        public PostController(AlumniNetworkDbContext context, IMapper mapper, IPostService postService)
         {
             _context = context;
             _mapper = mapper;
+            _postService = postService;
         }
 
         // GET: api/Posts
@@ -35,7 +38,7 @@ namespace AlumniNetworkBackend.Controllers
             var userIsTopicMember = await _context.Topics.Where(t => t.Users.Any(u => u.Id == userId)).ToListAsync();
             List<Post> TopicPosts = userIsTopicMember.SelectMany(p => p.Posts).ToList();
 
-            var filteredPostList = new 
+            var filteredPostList = new
             {
                 GroupPosts,
                 TopicPosts
@@ -62,14 +65,14 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/Posts/user/user_id
         [HttpGet("user/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromUser (string id)
+        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromUser(string id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
             var postsFromSpecificUser = await _context.Users.Where(u => u.Id == userId)
                 .SelectMany(p => p.Posts)
-                .Where(t => t.SenderId.Id == id)
+                .Where(t => t.SenderId == id)
                 .ToListAsync();
-                
+
             if (postsFromSpecificUser == null)
             {
                 return NotFound();
@@ -100,7 +103,7 @@ namespace AlumniNetworkBackend.Controllers
         {
             var postFromTopicAsTarget = await _context.Topics.Where(t => t.Id == id)
                 .SelectMany(p => p.Posts)
-                .Where(tt => tt.TargetGroup.Id == id)
+                .Where(tt => tt.TargetTopic.Id == id)
                 .ToListAsync();
 
             if (postFromTopicAsTarget == null)
@@ -120,7 +123,7 @@ namespace AlumniNetworkBackend.Controllers
                 .ToListAsync();
 
             if (postFromEventAsTarget == null)
-            { 
+            {
                 return NotFound();
             }
 
@@ -145,7 +148,7 @@ namespace AlumniNetworkBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PostExists(id))
+                if (!_postService.PostExists(id))
                 {
                     return NotFound();
                 }
@@ -163,32 +166,22 @@ namespace AlumniNetworkBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<PostCreateDTO>> PostPost(PostCreateDTO dtoPost)
         {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
             Post domainPost = _mapper.Map<Post>(dtoPost);
-            _context.Posts.Add(domainPost);
-            await _context.SaveChangesAsync();
-
+            await _postService.AddPostAsync(domainPost);
+            //if (dtoPost.TargetGroup != null)
+            //{
+            //    bool canPost = _context.Groups.Where(g => g.Members.Any(u => u.Id == userId)).Equals(true);
+            //    if (canPost)
+            //    {
+            //       await _postService.AddPostAsync(domainPost);
+            //    }
+            //    else
+            //    {
+            //        return new StatusCodeResult(403);
+            //    }
             return CreatedAtAction("GetPost", new { id = domainPost.Id }, _mapper.Map<PostReadCreateDTO>(domainPost));
-        }
 
-        // DELETE: api/Posts/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePost(int id)
-        {
-            var post = await _context.Posts.FindAsync(id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-
-            _context.Posts.Remove(post);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PostExists(int id)
-        {
-            return _context.Posts.Any(e => e.Id == id);
         }
     }
 }
