@@ -1,4 +1,5 @@
 using AlumniNetworkBackend.Models;
+using AlumniNetworkBackend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -58,7 +59,8 @@ namespace AlumniNetworkBackend
                     ValidAudience = "account",
                 };
             });
-
+            services.AddMvc();
+            services.AddScoped<ITopicService, TopicService>();
             services.AddHttpContextAccessor();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers();

@@ -25,7 +25,7 @@ namespace AlumniNetworkBackend.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=5CG05206QY\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
+            optionsBuilder.UseSqlServer("Data Source=5CG04676KY\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -188,7 +188,7 @@ namespace AlumniNetworkBackend.Models
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 TargetPost = null,
                 SenderId = {},
-                ReplyParentId = {},
+                ReplyParentId = null,
                 TargetEvent = {},
                 TargetGroup = {},
                 TargetTopic = {},
@@ -201,7 +201,7 @@ namespace AlumniNetworkBackend.Models
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 TargetPost = null,
                 SenderId = { },
-                ReplyParentId = { },
+                ReplyParentId = null,
                 TargetEvent = { },
                 TargetGroup = { },
                 TargetTopic = { },
@@ -214,7 +214,7 @@ namespace AlumniNetworkBackend.Models
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 TargetPost = null,
                 SenderId = { },
-                ReplyParentId = { },
+                ReplyParentId = null,
                 TargetEvent = { },
                 TargetGroup = { },
                 TargetTopic = { },
@@ -227,7 +227,7 @@ namespace AlumniNetworkBackend.Models
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 TargetPost = null,
                 SenderId = { },
-                ReplyParentId = { },
+                ReplyParentId = null,
                 TargetEvent = { },
                 TargetGroup = { },
                 TargetTopic = { },
