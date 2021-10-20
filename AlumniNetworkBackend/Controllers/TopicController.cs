@@ -13,22 +13,28 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.UserDTO;
+using AlumniNetworkBackend.Services;
+using System.Net.Mime;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json)]
     public class TopicController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITopicService _service;
 
-        public TopicController(AlumniNetworkDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor )
+        public TopicController(ITopicService service, AlumniNetworkDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _service = service;
         }
 
         /// <summary>
@@ -106,18 +112,11 @@ namespace AlumniNetworkBackend.Controllers
         public async Task<ActionResult<TopicCreateDTO>> PostTopic(TopicCreateDTO dtoTopic)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var creator = await _context.Users.Where(u => u.Id == userId).Select(n => new UserTestDTO
-            {
-                Id = n.Id,
-                Username = n.Username
-            }).FirstOrDefaultAsync();
-            User domainUser = _mapper.Map<User>(creator);
-            Topic domainTopic = _mapper.Map<Topic>(dtoTopic);
-            domainTopic.Users.Add(domainUser);
-            _context.Topics.Add(domainTopic);
-            await _context.SaveChangesAsync();
+            User tempUser = await _context.Users.Where(u => u.Id == "1").FirstAsync();
 
-            return CreatedAtAction("GetTopic", new { id = domainTopic.Id }, _mapper.Map<TopicCreateDTO>(domainTopic));
+            Topic newTopic = new() { Name = dtoTopic.Name, Description = dtoTopic.Description};
+            var updatedTopic = await _service.Create(newTopic, tempUser);
+            return _mapper.Map<TopicCreateDTO>(updatedTopic);
         }
 
         // POST: api/Topics
