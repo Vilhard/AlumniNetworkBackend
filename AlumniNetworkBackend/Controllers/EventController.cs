@@ -116,6 +116,16 @@ namespace AlumniNetworkBackend.Controllers
 
             return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
         }
+        // POST: api/Events
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost("{event_id}/invite/group/{group_id}")]
+        //public async Task<ActionResult<EventCreateGroupInviteDTO>> PostEvent([FromRoute] int event_id, [FromRoute] int group_id)
+        //{
+        //    _context.Events.Add(@event);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
+        //}
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]

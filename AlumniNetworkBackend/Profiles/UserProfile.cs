@@ -12,6 +12,7 @@ namespace AlumniNetworkBackend.Profiles
             CreateMap<User, UserReadDTO>().ReverseMap();
             CreateMap<User, UserCreateDTO>().ReverseMap();
             CreateMap<User, UserUpdateDTO>().ReverseMap();
+            CreateMap<User, UserTestDTO>().ReverseMap();
         }
     }
 }

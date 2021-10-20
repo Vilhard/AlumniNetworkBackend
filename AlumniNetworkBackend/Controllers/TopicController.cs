@@ -12,6 +12,7 @@ using AlumniNetworkBackend.Models.DTO.TopicDTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using AlumniNetworkBackend.Models.DTO.UserDTO;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -104,55 +105,47 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicCreateDTO>> PostTopic(TopicCreateDTO dtoTopic)
         {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            var creator = await _context.Users.Where(u => u.Id == userId).Select(n => new UserTestDTO
+            {
+                Id = n.Id,
+                Username = n.Username
+            }).FirstOrDefaultAsync();
+            User domainUser = _mapper.Map<User>(creator);
             Topic domainTopic = _mapper.Map<Topic>(dtoTopic);
+            domainTopic.Users.Add(domainUser);
             _context.Topics.Add(domainTopic);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTopic", new { id = domainTopic.Id }, domainTopic);
+            return CreatedAtAction("GetTopic", new { id = domainTopic.Id }, _mapper.Map<TopicCreateDTO>(domainTopic));
         }
 
         // POST: api/Topics
-        // Work in progress
         [HttpPost("{id}/join")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<Topic>> PostTopic()
+        public async Task<ActionResult<TopicCreateMemberDTO>> PostTopicMember([FromRoute] int id)
         {
-            string userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
 
-            var user = new User
+            if (!TopicExists(id))
             {
-                Id = userId
-            };
-
-            var topic = new Topic
-            {
-                Users = (ICollection<User>)user
-            };
-
-            Topic domainTopic = _mapper.Map<Topic>(topic);
-            _context.Topics.Add(domainTopic);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetTopic", _mapper.Map<TopicCreateMemberDTO>(topic));
-        }
-
-        // DELETE: api/Topics/5
-        [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> DeleteTopic(int id)
-        {
-            var topic = await _context.Topics.FindAsync(id);
-            if (topic == null)
-            {
-                return NotFound();
+                return new StatusCodeResult(404);
             }
+            var user = await _context.Users.FindAsync(userId);
 
-            _context.Topics.Remove(topic);
+            if (user == null)
+            {
+                return new StatusCodeResult(404);
+            }
+  
+            var updatedTopicUsers = _context.Topics.Where(t => t.Id == id)
+                .SelectMany(u => u.Users)
+                .Append(user);
             await _context.SaveChangesAsync();
+            
 
-            return NoContent();
+            return Ok(updatedTopicUsers);
         }
-
         private bool TopicExists(int id)
         {
             return _context.Topics.Any(e => e.Id == id);
