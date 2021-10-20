@@ -12,7 +12,7 @@ namespace AlumniNetworkBackend.Models.Domain
         public string Text { get; set; }
         // SenderID & ReplyParentID relationshipt pitää kattoo
         public string SenderId { get; set; }
-        public int ReplyParentId { get; set; }
+        public int? ReplyParentId { get; set; }
         public Post TargetPost { get; set; }
         public User TargetUser { get; set; }
         public Group TargetGroup { get; set; }
