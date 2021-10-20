@@ -82,8 +82,7 @@ namespace AlumniNetworkBackend.Models
                 BannerImg = "noroff.jpg",
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
-                CreatedBy = 2,
-                User = "Keijo Johnson",
+                CreatedById = "2",
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -99,8 +98,7 @@ namespace AlumniNetworkBackend.Models
                 BannerImg = "experis.jpg",
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
-                CreatedBy = 2,
-                User = "Keijo Johnson",
+                CreatedById = "2",
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -116,8 +114,7 @@ namespace AlumniNetworkBackend.Models
                 BannerImg = "party.jpg",
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
-                CreatedBy = 2,
-                User = "Keijo Johnson",
+                CreatedById = "1",
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -133,8 +130,7 @@ namespace AlumniNetworkBackend.Models
                 BannerImg = "allbymyself.jpg",
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
-                CreatedBy = 2,
-                User = "Keijo Johnson",
+                CreatedById = "4",
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -186,9 +182,8 @@ namespace AlumniNetworkBackend.Models
                 Id = 1,
                 Text = "What's up everybody?",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                TargetPost = null,
                 SenderId = {},
-                ReplyParentId = {},
+                ReplyParentId = null,
                 TargetEvent = {},
                 TargetGroup = {},
                 TargetTopic = {},
@@ -199,9 +194,8 @@ namespace AlumniNetworkBackend.Models
                 Id = 2,
                 Text = "Feeling good!",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                TargetPost = null,
                 SenderId = { },
-                ReplyParentId = { },
+                ReplyParentId = 1,
                 TargetEvent = { },
                 TargetGroup = { },
                 TargetTopic = { },
@@ -212,9 +206,8 @@ namespace AlumniNetworkBackend.Models
                 Id = 3,
                 Text = "Today's going to be a good day!",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                TargetPost = null,
                 SenderId = { },
-                ReplyParentId = { },
+                ReplyParentId = 1,
                 TargetEvent = { },
                 TargetGroup = { },
                 TargetTopic = { },
@@ -225,9 +218,8 @@ namespace AlumniNetworkBackend.Models
                 Id = 4,
                 Text = "Is there any good Events to attend anytime soon?",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                TargetPost = null,
                 SenderId = { },
-                ReplyParentId = { },
+                ReplyParentId = null,
                 TargetEvent = { },
                 TargetGroup = { },
                 TargetTopic = { },
@@ -288,34 +280,34 @@ namespace AlumniNetworkBackend.Models
             modelBuilder.Entity<RSVP>().HasData(new RSVP()
             {
                 Id = 1,
-                Event = {},
+                EventId = 2,
                 GuestCount = 3,
                 LastUpdated = new DateTime(2021, 12, 12, 19, 30, 0),
-                User = {} 
+                UserId = "2" 
             });
             modelBuilder.Entity<RSVP>().HasData(new RSVP()
             {
                 Id = 2,
-                Event = { },
+                EventId = 1,
                 GuestCount = 5,
                 LastUpdated = new DateTime(2021, 12, 12, 19, 30, 0),
-                User = { }
+                UserId = "1"
             });
             modelBuilder.Entity<RSVP>().HasData(new RSVP()
             {
                 Id = 3,
-                Event = { },
+                EventId = 3,
                 GuestCount = 2,
                 LastUpdated = new DateTime(2021, 12, 12, 19, 30, 0),
-                User = { }
+                UserId = "4"
             });
             modelBuilder.Entity<RSVP>().HasData(new RSVP()
             {
                 Id = 4,
-                Event = { },
+                EventId = 3,
                 GuestCount = 10,
                 LastUpdated = new DateTime(2021, 12, 12, 19, 30, 0),
-                User = { }
+                UserId = "3"
             });
 
             //Seeding data to linking table between user & event
@@ -387,10 +379,10 @@ namespace AlumniNetworkBackend.Models
                    {
                        je.HasKey("EventId", "GroupId");
                        je.HasData(
-                           new { EventId = 1, GroupId = 1 },
-                           new { EventId = 2, GroupId = 3 },
+                           new { EventId = 4, GroupId = 1 },
+                           new { EventId = 3, GroupId = 3 },
                            new { EventId = 2, GroupId = 2 },
-                           new { EventId = 4, GroupId = 4 }
+                           new { EventId = 1, GroupId = 4 }
                            );
                    });
 
@@ -406,13 +398,22 @@ namespace AlumniNetworkBackend.Models
                    {
                        je.HasKey("EventId", "TopicId");
                        je.HasData(
-                           new { EventId = 1, TopicId = 2 },
-                           new { EventId = 3, TopicId = 4 },
                            new { EventId = 3, TopicId = 2 },
-                           new { EventId = 2, TopicId = 3 }
+                           new { EventId = 2, TopicId = 4 },
+                           new { EventId = 1, TopicId = 2 },
+                           new { EventId = 4, TopicId = 3 }
                            );
                    });
 
+            modelBuilder.Entity<Event>()
+               .HasOne(e => e.CreatedBy)
+               .WithMany(u => u.CreatedEvents)
+               .HasForeignKey(e => e.CreatedById);
+
+            modelBuilder.Entity<Post>()
+               .HasOne(p => p.Sender)
+               .WithMany(u => u.Posts)
+               .HasForeignKey(e => e.SenderId);
 
             //modelBuilder.Entity<Movie>()
             //   .HasOne(f => f.Franchise)

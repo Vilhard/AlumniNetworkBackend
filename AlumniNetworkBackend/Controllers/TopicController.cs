@@ -37,7 +37,7 @@ namespace AlumniNetworkBackend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
             return _mapper.Map<List<TopicReadDTO>>(await _context.Topics.ToListAsync());
@@ -50,7 +50,7 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicReadDTO>> GetTopic(int id)
         {
             Topic topic = await _context.Topics.FindAsync(id);
@@ -66,7 +66,7 @@ namespace AlumniNetworkBackend.Controllers
         // PUT: api/Topics/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PutTopic(int id, Topic topic)
         {
             if (id != topic.Id)
@@ -102,7 +102,7 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="dtoTopic"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicCreateDTO>> PostTopic(TopicCreateDTO dtoTopic)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
@@ -122,7 +122,7 @@ namespace AlumniNetworkBackend.Controllers
 
         // POST: api/Topics
         [HttpPost("{id}/join")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicCreateMemberDTO>> PostTopicMember([FromRoute] int id)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId

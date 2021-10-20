@@ -16,14 +16,21 @@ namespace AlumniNetworkBackend.Models.Domain
         public bool AllowGuests { get; set; }
         public string BannerImg { get; set; }
         public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; } 
-        public int CreatedBy { get; set; }
-        public string User { get; set; }
+        public DateTime EndTime { get; set; }
+        
+        //Relationships
+        //One to many relationship with user
+        public string CreatedById { get; set; }
+        public User CreatedBy { get; set; }
+        //Event can have many users
         public ICollection<User> Users { get; set; }
         //Many to many relationship with Topic, joining table EventTopic
         public ICollection<Topic> Topic { get; set; }
         //Many to many relationship with Group, joining table EventGroup
         public ICollection<Group> Group { get; set; }
+        //One to Many relationship to Posts
         public ICollection<Post> Posts { get; set; }
+        //Event can have many RSVPs
+        public ICollection<RSVP> RSVPs { get; set; }
     }
 }
