@@ -26,7 +26,11 @@ namespace AlumniNetworkBackend.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Events
+        /// <summary>
+        /// Api endpoint api/Events for GET action which returns all events that 
+        /// belongs to Groups and Topics where user is subscribed 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<EventForUserReadDTO>> GetEvents()
         {

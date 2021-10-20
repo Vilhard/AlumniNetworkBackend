@@ -12,7 +12,6 @@ namespace AlumniNetworkBackend.Models.Domain
         public DateTime LastUpdated { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
-        [MaxLength(30)]
         public string Description { get; set; }
         public bool AllowGuests { get; set; }
         public string BannerImg { get; set; }
@@ -21,8 +20,10 @@ namespace AlumniNetworkBackend.Models.Domain
         public int CreatedBy { get; set; }
         public string User { get; set; }
         public ICollection<User> Users { get; set; }
-        public ICollection<Topic> Topics { get; set; }
-        public ICollection<Group> Groups { get; set; }
+        //Many to many relationship with Topic, joining table EventTopic
+        public ICollection<Topic> Topic { get; set; }
+        //Many to many relationship with Group, joining table EventGroup
+        public ICollection<Group> Group { get; set; }
         public ICollection<Post> Posts { get; set; }
     }
 }

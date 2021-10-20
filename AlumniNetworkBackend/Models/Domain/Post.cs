@@ -9,6 +9,7 @@ namespace AlumniNetworkBackend.Models.Domain
     {
         public int Id { get; set; }
         public DateTime TimeStamp { get; set; }
+        public string Text { get; set; }
         public Post TargetPost { get; set; }
         public User SenderId { get; set; }
         public User ReplyParentId { get; set; }

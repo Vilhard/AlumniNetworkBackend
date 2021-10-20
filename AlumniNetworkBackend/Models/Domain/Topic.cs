@@ -10,10 +10,10 @@ namespace AlumniNetworkBackend.Models.Domain
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        [MaxLength(30)]
         public string Description { get; set; }
         public ICollection<User> Users { get; set; }
-        public ICollection<Event> Events { get; set; }
+        //Many to many relationship with Event, joining table Topic EventTopic
+        public ICollection<Event> Event { get; set; }
         public ICollection<Post> Posts { get; set; }
     }
 }
