@@ -13,5 +13,6 @@ namespace AlumniNetworkBackend.Models.DTO.TopicDTO
         public string Name { get; set; }
         [MaxLength(30)]
         public string Description { get; set; }
+        public List<UserTestDTO> Users { get; set; }
     }
 }

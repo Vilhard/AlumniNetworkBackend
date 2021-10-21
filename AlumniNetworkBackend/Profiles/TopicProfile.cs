@@ -17,7 +17,7 @@ namespace AlumniNetworkBackend.Profiles
                 .ReverseMap();
 
             //Map Topic model to create DTO
-            CreateMap<Topic, TopicCreateDTO>();
+            CreateMap<Topic, TopicCreateDTO>().ForMember(tdto => tdto.Users, opt => opt.Ignore());
             //.ForMember(tdto => tdto.Users, opt => opt.MapFrom(t => t.Users.Select(t => t.Id).ToArray()));
             //Map topic model to update DTO
             CreateMap<Topic, TopicUpdateDTO>()
