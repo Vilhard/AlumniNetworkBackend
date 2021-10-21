@@ -61,6 +61,7 @@ namespace AlumniNetworkBackend
             });
             services.AddScoped<ITopicService, TopicService>();
             services.AddHttpContextAccessor();
+            services.AddScoped<ITopicService, TopicService>();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers();
             services.AddSwaggerGen(c =>
