@@ -46,8 +46,8 @@ namespace AlumniNetworkBackend.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
-            var allTopics = await _service.GetAllTopics();
-            return _mapper.Map<List<TopicReadDTO>>(allTopics);
+            List<Topic> topics = await _service.GetAllTopics();
+            return _mapper.Map<List<TopicReadDTO>>(topics);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace AlumniNetworkBackend.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicReadDTO>> GetTopic(int id)
         {
-            var topic = await _service.GetTopicById(id);
+            Topic topic = await _service.GetTopicById(id);
 
             if (topic == null)
             {
@@ -81,7 +81,11 @@ namespace AlumniNetworkBackend.Controllers
         public async Task<ActionResult<TopicCreateDTO>> PostTopic(TopicCreateDTO dtoTopic)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            User tempUser = await _context.Users.Where(u => u.Id == "1").FirstAsync();
+            if (userId == null)
+            {
+                return new StatusCodeResult(400);
+            }
+            User tempUser = await _context.Users.Where(u => u.Id == userId).FirstAsync();
 
             Topic newTopic = new() { Name = dtoTopic.Name, Description = dtoTopic.Description};
             var updatedTopic = await _service.Create(newTopic, tempUser);

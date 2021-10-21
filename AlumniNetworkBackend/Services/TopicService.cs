@@ -45,9 +45,9 @@ namespace AlumniNetworkBackend.Services
             await _context.SaveChangesAsync();
         }
 
-        public async bool AddUserToTopic(int topicId, string userId)
-        {
-            throw new NotImplementedException();
-        }
+        //public async bool AddUserToTopic(int topicId, string userId)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

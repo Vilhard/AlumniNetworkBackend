@@ -14,6 +14,6 @@ namespace AlumniNetworkBackend.Services
         public Task<Topic> GetTopicById(int id);
         public Task<Topic> Create(Topic newTopic, User user);
         public Task AddUserToCreatedTopic(Topic topic, User user);
-        public bool AddUserToTopic(int topicId, string userId);
+        //public bool AddUserToTopic(int topicId, string userId);
     }
 }

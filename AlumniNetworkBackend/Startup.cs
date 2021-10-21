@@ -1,4 +1,5 @@
 using AlumniNetworkBackend.Models;
+using AlumniNetworkBackend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -60,6 +61,7 @@ namespace AlumniNetworkBackend
             });
 
             services.AddHttpContextAccessor();
+            services.AddScoped<ITopicService, TopicService>();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers();
             services.AddSwaggerGen(c =>
