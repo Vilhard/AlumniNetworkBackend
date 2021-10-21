@@ -12,8 +12,8 @@ namespace AlumniNetworkBackend.Services
     {
         public Task<List<Topic>> GetAllTopics();
         public Task<Topic> GetTopicById(int id);
-        public Task<Topic> Create(Topic newTopic, User user);
+        public Task<Topic> Create(Topic newTopic, string userId);
         public Task AddUserToCreatedTopic(Topic topic, User user);
-        public bool AddUserToTopic(int topicId, string userId);
+        public Task<Topic> AddUserToTopic(int topicId, string userId);
     }
 }
