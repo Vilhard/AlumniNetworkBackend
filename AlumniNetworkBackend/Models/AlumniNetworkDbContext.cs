@@ -182,48 +182,48 @@ namespace AlumniNetworkBackend.Models
                 Id = 1,
                 Text = "What's up everybody?",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                SenderId = {},
+                SenderId = "1",
                 ReplyParentId = null,
-                TargetEvent = {},
-                TargetGroup = {},
-                TargetTopic = {},
-                TargetUser = {}
+                TargetEventId = null,
+                TargetGroupId = null,
+                TargetTopicId = null,
+                TargetUserId = null
             });
             modelBuilder.Entity<Post>().HasData(new Post()
             {
                 Id = 2,
                 Text = "Feeling good!",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                SenderId = { },
+                SenderId = "2",
                 ReplyParentId = 1,
-                TargetEvent = { },
-                TargetGroup = { },
-                TargetTopic = { },
-                TargetUser = { }
+                TargetEventId = null,
+                TargetGroupId = null,
+                TargetTopicId = null,
+                TargetUserId = null
             });
             modelBuilder.Entity<Post>().HasData(new Post()
             {
                 Id = 3,
                 Text = "Today's going to be a good day!",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                SenderId = { },
+                SenderId = "3",
                 ReplyParentId = 1,
-                TargetEvent = { },
-                TargetGroup = { },
-                TargetTopic = { },
-                TargetUser = { }
+                TargetEventId = null,
+                TargetGroupId = null,
+                TargetTopicId = null,
+                TargetUserId = null
             });
             modelBuilder.Entity<Post>().HasData(new Post()
             {
                 Id = 4,
                 Text = "Is there any good Events to attend anytime soon?",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
-                SenderId = { },
+                SenderId = "4",
                 ReplyParentId = null,
-                TargetEvent = { },
-                TargetGroup = { },
-                TargetTopic = { },
-                TargetUser = { }
+                TargetEventId = null,
+                TargetGroupId = null,
+                TargetTopicId = null,
+                TargetUserId = "2"
             });
 
             //Mock data for User
@@ -414,11 +414,6 @@ namespace AlumniNetworkBackend.Models
                .HasOne(p => p.Sender)
                .WithMany(u => u.Posts)
                .HasForeignKey(e => e.SenderId);
-
-            //modelBuilder.Entity<Movie>()
-            //   .HasOne(f => f.Franchise)
-            //   .WithMany(m => m.Movies)
-            //   .HasForeignKey(f => f.FranchiseId);
         }
 
     }
