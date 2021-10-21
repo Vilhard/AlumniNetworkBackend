@@ -1,6 +1,7 @@
 ﻿using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
 using AlumniNetworkBackend.Models.DTO.PostDTO;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,28 +23,36 @@ namespace AlumniNetworkBackend.Services
             return post;
         }
 
-        public Task findPostTarget(PostCreateDTO post)
+        public async Task<Post> AddPostToGroup(PostCreateDTO dtoPost, string userId, int targetId )
         {
-            if (post.TargetEvent != null)
+            Post post = new()
             {
+                SenderId = userId,
+                TargetGroupId = dtoPost.TargetGroup,
+                TimeStamp = DateTime.Now
+            };
 
-            } else if (post.TargetGroup != null)
-            {
-                
-            } else if (post.TargetTopic != null)
-            {
+            var returnValue = _context.Posts.Add(post);
+            await _context.SaveChangesAsync();
 
-            } else if (post.TargetUser != null)
-            {
+            Group group = await _context.Groups
+                .Include(p => p.Posts)
+                .Where(g => g.Id == targetId)
+                .FirstAsync();
 
-            }
+            if (group == null)
+                return null;
 
-            throw new NotImplementedException();
+            List<Post> posts = group.Posts.ToList();
+            posts.Add(returnValue.Entity);
+            group.Posts = posts;
+            return returnValue.Entity;
         }
-
+        
         public bool PostExists(int id)
         {
             return _context.Posts.Any(p => p.Id == id);
         }
+
     }
 }

@@ -36,7 +36,6 @@ namespace AlumniNetworkBackend.Controllers
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's 
             List<Group> filteredGroupList = await _context.Groups.Where(g => g.IsPrivate).Where(g => g.Members.Any(u => u.Id != userId)).ToListAsync();
-
             return _mapper.Map<List<GroupReadDTO>>(filteredGroupList);
         }
 

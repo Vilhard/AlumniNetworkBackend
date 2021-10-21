@@ -9,6 +9,9 @@ using AutoMapper;
 using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.PostDTO;
 using AlumniNetworkBackend.Services;
+using System;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -164,24 +167,57 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Posts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PostCreateDTO>> PostPost(PostCreateDTO dtoPost)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<PostReadDTO>> PostPost(PostCreateDTO dtoPost)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            Post domainPost = _mapper.Map<Post>(dtoPost);
-            await _postService.AddPostAsync(domainPost);
-            //if (dtoPost.TargetGroup != null)
-            //{
-            //    bool canPost = _context.Groups.Where(g => g.Members.Any(u => u.Id == userId)).Equals(true);
-            //    if (canPost)
-            //    {
-            //       await _postService.AddPostAsync(domainPost);
-            //    }
-            //    else
-            //    {
-            //        return new StatusCodeResult(403);
-            //    }
-            return CreatedAtAction("GetPost", new { id = domainPost.Id }, _mapper.Map<PostReadCreateDTO>(domainPost));
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
+            if (dtoPost.TargetGroup != null)
+            {
+                var addPostToGroup = await _postService.AddPostToGroup(dtoPost, userId, (int)dtoPost.TargetGroup);
+                if (addPostToGroup == null)
+                    return BadRequest();
+
+                return  _mapper.Map<PostReadDTO>(addPostToGroup);
+            }
+            else if (dtoPost.TargetTopic != null)
+            {
+                Post post = new Post
+                {
+                    SenderId = userId,
+                    TargetTopicId = dtoPost.TargetTopic,
+                    TimeStamp = DateTime.Now
+                };
+                //return CreatedAtAction("GetPost", new { id = domainPost.Id }, _mapper.Map<PostReadCreateDTO>(domainPost));
+            } else if (dtoPost.TargetEvent != null)
+            {
+                Post post = new Post
+                {
+                    SenderId = userId,
+                    TargetEventId = dtoPost.TargetEvent,
+                    TimeStamp = DateTime.Now
+                };
+
+            } else if (dtoPost.TargetUser != null)
+            {
+                Post post = new Post
+                {
+                    SenderId = userId,
+                    TargetUserId = dtoPost.TargetUser,
+                    TimeStamp = DateTime.Now
+                };
+
+            } else if (dtoPost.TargetPost != null)
+            {
+                Post post = new Post
+                {
+                    SenderId = userId,
+                    TargetPostId = dtoPost.TargetPost,
+                    TimeStamp = DateTime.Now
+                };
+
+            }
+            return NoContent();
         }
-    }
+    } 
 }

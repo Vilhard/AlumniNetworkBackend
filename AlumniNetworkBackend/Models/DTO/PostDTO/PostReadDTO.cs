@@ -8,7 +8,8 @@ namespace AlumniNetworkBackend.Models.DTO.PostDTO
 {
     public class PostReadDTO
     {
-        public List<Post> GroupPosts { get; set; }
-        public List<Post> TopicPosts { get; set; }
+        public string SenderId { get; set; }
+        public string Text { get; set; }
+        public DateTime TimeStamp { get; set; }
     }
 }
