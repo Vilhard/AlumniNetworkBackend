@@ -1,5 +1,6 @@
 ﻿using AlumniNetworkBackend.Models.Domain;
 using AlumniNetworkBackend.Models.DTO.TopicDTO;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,10 @@ namespace AlumniNetworkBackend.Services
 {
     public interface ITopicService
     {
+        public Task<List<Topic>> GetAllTopics();
+        public Task<Topic> GetTopicById(int id);
         public Task<Topic> Create(Topic newTopic, User user);
-        public Task<Topic> UpdateUsers(Topic topic, User user);
+        public Task AddUserToCreatedTopic(Topic topic, User user);
+        public bool AddUserToTopic(int topicId, string userId);
     }
 }

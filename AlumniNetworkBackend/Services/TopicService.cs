@@ -18,23 +18,36 @@ namespace AlumniNetworkBackend.Services
             _context = context;
         }
 
+        public async Task<List<Topic>> GetAllTopics()
+        {
+            return await _context.Topics.Include(t => t.Users).ToListAsync();
+        }
+
+        public async Task<Topic> GetTopicById(int id)
+        {
+            return await _context.Topics.Include(t => t.Users).Where(t => t.Id == id).FirstAsync();
+        }
+
         public async Task<Topic> Create(Topic newTopic, User user)
         {
             var returnValue = _context.Topics.Add(newTopic);
             await _context.SaveChangesAsync();
-            await UpdateUsers(returnValue.Entity, user);
+            await AddUserToCreatedTopic(returnValue.Entity, user);
             return returnValue.Entity;
         }
 
-        public async Task<Topic> UpdateUsers(Topic topic, User user)
+        public async Task AddUserToCreatedTopic(Topic topic, User user)
         {
             
             Topic topicToUpdateUsers = await _context.Topics.Include(u => u.Users).Where(t => t.Id == topic.Id).FirstAsync();
             List<User> userList = new() { user };
             topicToUpdateUsers.Users = userList;
             await _context.SaveChangesAsync();
+        }
 
-            return topicToUpdateUsers;
+        public async bool AddUserToTopic(int topicId, string userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

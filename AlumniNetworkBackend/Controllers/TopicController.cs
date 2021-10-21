@@ -46,7 +46,8 @@ namespace AlumniNetworkBackend.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
-            return _mapper.Map<List<TopicReadDTO>>(await _context.Topics.ToListAsync());
+            var allTopics = await _service.GetAllTopics();
+            return _mapper.Map<List<TopicReadDTO>>(allTopics);
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace AlumniNetworkBackend.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicReadDTO>> GetTopic(int id)
         {
-            Topic topic = await _context.Topics.FindAsync(id);
+            var topic = await _service.GetTopicById(id);
 
             if (topic == null)
             {
