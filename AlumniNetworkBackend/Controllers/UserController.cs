@@ -38,12 +38,12 @@ namespace AlumniNetworkBackend.Controllers
         // GET: api/User
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public Task<ActionResult<UserReadDTO>> GetUsers()
-        {
-            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+        //public Task<ActionResult<UserReadDTO>> GetUsers()
+        //{
+        //    string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            
-        }
+           
+        //}
 
         // GET: api/Users/5
         [HttpGet("{id}")]

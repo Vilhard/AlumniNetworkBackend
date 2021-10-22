@@ -8,6 +8,6 @@ namespace AlumniNetworkBackend.Services
 {
     public interface IUserService
     {
-        public Task<User> GetUser(int id)
+        public Task<User> GetUser(int id);
     }
 }

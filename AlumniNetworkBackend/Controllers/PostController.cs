@@ -33,24 +33,22 @@ namespace AlumniNetworkBackend.Controllers
         // GET: api/Posts
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<PostReadDTO>> GeUserGroupAndTopicPosts()
+        public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GeUserGroupAndTopicPosts()
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
             var userTopicPosts = await _context.Posts
                 .Include(t => t.TargetTopic).ThenInclude(u => u.Users)
             .Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
-           // var userTopicPosts = await _context.Posts.Include(p => p.TargetPosts).ToListAsync();
 
-            //var userGroupPosts = await _context.Posts
-            //    .Include(t => t.TargetGroup).ToListAsync();
-            //.Where(u => u.TargetGroup.Members.Any(x => x.Id == userId))
+            var userGroupPosts = await _context.Posts
+                .Include(t => t.TargetGroup).ThenInclude(u => u.Members)
+            .Where(u => u.TargetGroup.Members.Any(x => x.Id == userId)).ToListAsync();
 
-            List<Post> combined = new();
-            //combined.Add(userTopicPosts);
-          
 
-            return _mapper.Map<PostReadDTO>(combined);
+            var combinedList = userTopicPosts.Concat(userGroupPosts).OrderByDescending(x => x.TimeStamp).ToList();
+
+            return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
         // GET: api/Posts/user
         [HttpGet("/user")]
