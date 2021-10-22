@@ -414,6 +414,7 @@ namespace AlumniNetworkBackend.Models
                .HasOne(p => p.Sender)
                .WithMany(u => u.Posts)
                .HasForeignKey(e => e.SenderId);
+
         }
 
     }

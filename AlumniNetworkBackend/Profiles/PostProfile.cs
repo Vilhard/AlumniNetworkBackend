@@ -15,7 +15,6 @@ namespace AlumniNetworkBackend.Profiles
                 .ForMember(dtop => dtop.TargetEvent, opt => opt.MapFrom(x => x.TargetEventId))
                 .ForMember(dtop => dtop.TargetTopic, opt => opt.MapFrom(x => x.TargetTopicId))
                 .ForMember(dtop => dtop.TargetUser, opt => opt.MapFrom(x => x.TargetUserId))
-                .ForMember(dtop => dtop.TargetPost, opt => opt.MapFrom(x => x.TargetPostId))
                 .ReverseMap();
 
                  //.ForMember(tdto => tdto.Users, opt => opt.MapFrom(t => t.Users.Select(t => t.Id).ToArray()));

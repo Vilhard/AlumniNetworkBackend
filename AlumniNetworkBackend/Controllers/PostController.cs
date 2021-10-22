@@ -32,22 +32,25 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/Posts
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<PostReadDTO>> GeUserGroupAndTopicPosts()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var userIsGroupMember = await _context.Groups.Where(g => g.Members.Any(u => u.Id == userId)).ToListAsync();
-            List<Post> GroupPosts = userIsGroupMember.SelectMany(p => p.Posts).ToList();
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
-            var userIsTopicMember = await _context.Topics.Where(t => t.Users.Any(u => u.Id == userId)).ToListAsync();
-            List<Post> TopicPosts = userIsTopicMember.SelectMany(p => p.Posts).ToList();
+            //var userTopicPosts =  await _context.Posts
+            //    .Include(t => t.TargetTopic).ThenInclude(u => u.Users)
+            //.Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
+            var userTopicPosts = await _context.Posts.Include(p => p.TargetPosts).ToListAsync();
 
-            var filteredPostList = new
-            {
-                GroupPosts,
-                TopicPosts
-            };
+            //var userGroupPosts = await _context.Posts
+            //    .Include(t => t.TargetGroup).ToListAsync();
+            //.Where(u => u.TargetGroup.Members.Any(x => x.Id == userId))
 
-            return _mapper.Map<PostReadDTO>(filteredPostList);
+            List<Post> combined = new();
+            //combined.Add(userTopicPosts);
+          
+
+            return _mapper.Map<PostReadDTO>(combined);
         }
         // GET: api/Posts/user
         [HttpGet("/user")]
@@ -175,22 +178,25 @@ namespace AlumniNetworkBackend.Controllers
             
            if (isMember)
             {
-                Post post = new()
-                {
-                    SenderId = userId,
-                    Text = dtoPost.Text,
-                    ReplyParentId = dtoPost?.ReplyParentId,
-                    TargetGroupId = dtoPost?.TargetGroup,
-                    TargetEventId = dtoPost?.TargetEvent,
-                    TargetTopicId = dtoPost?.TargetTopic,
-                    TargetPostId = dtoPost?.TargetPost,
-                    TargetUserId = dtoPost?.TargetUser,
-                    TimeStamp = DateTime.Now
-                };
-               var posted = await _postService.AddPostAsync(post);
-                return _mapper.Map<PostReadDTO>(posted);
-            }
+                    Post post = new()
+                    {
+                        SenderId = userId,
+                        Text = dtoPost.Text,
+                        TargetEventId = dtoPost?.TargetEvent,
+                        TargetGroupId = dtoPost?.TargetGroup,
+                        TargetTopicId = dtoPost?.TargetTopic,
+                        ReplyParentId = dtoPost.ReplyParentId,
+                        TargetUserId = dtoPost?.TargetUser,
+                        TimeStamp = DateTime.Now
+                    };
+                    var result = await _postService.AddPostAsync(post);
+                    if (result == null)
+                        return BadRequest();
+                return _mapper.Map<PostReadDTO>(result);
+            } else 
+            {
             return new StatusCodeResult(403);
+            }
         }
     } 
 }
