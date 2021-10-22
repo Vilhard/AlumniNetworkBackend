@@ -168,11 +168,11 @@ namespace AlumniNetworkBackend.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<PostCreateDTO>> PostPost(PostCreateDTO dtoPost)
+        public async Task<ActionResult<PostReadDTO>> PostPost(PostCreateDTO dtoPost)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
             bool isMember = dtoPost.Members.Any(u => u.Id == userId);
-
+            
            if (isMember)
             {
                 Post post = new()
@@ -187,10 +187,8 @@ namespace AlumniNetworkBackend.Controllers
                     TargetUserId = dtoPost?.TargetUser,
                     TimeStamp = DateTime.Now
                 };
-                var returningPost = _context.Posts.Add(post);
-                await _context.SaveChangesAsync();
-                return _mapper.Map<PostCreateDTO>(returningPost.Entity);
-
+               var posted = await _postService.AddPostAsync(post);
+                return _mapper.Map<PostReadDTO>(posted);
             }
             return new StatusCodeResult(403);
         }

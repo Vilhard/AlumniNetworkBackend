@@ -11,6 +11,5 @@ namespace AlumniNetworkBackend.Services
     {
         public Task<Post> AddPostAsync(Post post);
         public bool PostExists(int id);
-        public Task<Post> AddPostToGroup(PostCreateDTO dtoPost, string userId, int targetId);
     }
 }
