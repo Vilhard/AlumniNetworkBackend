@@ -14,6 +14,9 @@ using AutoMapper;
 using AlumniNetworkBackend.Models.DTO;
 using AlumniNetworkBackend.Models.DTO.UserDTO;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Net.Http;
+using System.Net;
+using System.Security.Claims;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -24,6 +27,8 @@ namespace AlumniNetworkBackend.Controllers
         private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
 
+        public object HttsStatusCode { get; private set; }
+
         public UserController(AlumniNetworkDbContext context, IMapper mapper)
         {
             _context = context;
@@ -32,10 +37,12 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/User
         [HttpGet]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public Task<ActionResult<UserReadDTO>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+            
         }
 
         // GET: api/Users/5
