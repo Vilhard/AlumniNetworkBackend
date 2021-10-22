@@ -14,49 +14,74 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Net.Mime;
+using AlumniNetworkBackend.Services;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json)]
     public class GroupController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IGroupService _service;
 
-        public GroupController(AlumniNetworkDbContext context, IMapper mapper)
+        public GroupController(AlumniNetworkDbContext context, IMapper mapper, IGroupService service)
         {
             _context = context;
             _mapper = mapper;
+            _service = service;
         }
-        // GET: api/Group
+        /// <summary>
+        /// Api endpoint api/Group which returns groups which are either not private,
+        /// or the client is member of.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's 
-            List<Group> filteredGroupList = await _context.Groups.Where(g => g.IsPrivate).Where(g => g.Members.Any(u => u.Id != userId)).ToListAsync();
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+            List<Group> filteredGroupList = await _context.Groups
+                .Include(g=>g.Members)
+                .Where(g => g.IsPrivate == false || g.Members.Any(u => u.Id.Contains(userId)))
+                .ToListAsync();
+
             return _mapper.Map<List<GroupReadDTO>>(filteredGroupList);
         }
 
-        // GET: api/Groups/5
+        /// <summary>
+        /// Api endpoint api/Group/id which returns group by groupId provided that client is either 
+        /// group member or group is not private
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<GroupReadDTO>> GetGroup(int id)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<GroupReadDTO>> GetGroupById(int id)
         {
             try
             {
-                Group domainGroup = await _context.Groups.FindAsync(id);
-                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's 
-                bool IsNotMember = domainGroup.Members.Where(u => u.Id != userId).Equals(true);
-                if (domainGroup == null)
+                string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+                Group filteredGroup = _context.Groups
+                   .Include(g => g.Members)
+                   .Where(g => g.Id == id)
+                   .Where(g => g.IsPrivate == false || g.Members.Any(u => u.Id.Contains(userId)))
+                   .Single();
+
+                if(filteredGroup.IsPrivate == false || filteredGroup.Members.Any(u => u.Id == userId))
                 {
-                    return NotFound();
+                    return _mapper.Map<GroupReadDTO>(filteredGroup);
                 }
-                if (domainGroup.IsPrivate && IsNotMember)
+                else
                 {
                     return new StatusCodeResult(403);
                 }
-                return _mapper.Map<GroupReadDTO>(domainGroup);
             }
             catch
             {
@@ -64,71 +89,58 @@ namespace AlumniNetworkBackend.Controllers
             }
         }
 
-        // PUT: api/Groups/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGroup(int id, Group @group)
-        {
-            if (id != @group.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(@group).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GroupExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Groups
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // <summary>
+        /// Endpoint api/Groups which posts a new Group to database with name
+        /// and description.
+        /// </summary>
+        /// <param name="dtoTopic"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(GroupCreateDTO dtoGroup)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<GroupCreateDTO>> PostGroup(GroupCreateDTO dtoGroup)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            User creator = await _context.Users.FindAsync(userId);
-            Group domainGroup = _mapper.Map<Group>(dtoGroup);
-            domainGroup.Members.Add(creator);
-            _context.Groups.Add(domainGroup);
-            await _context.SaveChangesAsync();
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            return CreatedAtAction("GetGroup", new { name = domainGroup.Name, }, _mapper.Map<GroupReadDTO>(domainGroup));
-        }
+            Group newGroup = new() { Name = dtoGroup.Name, Description = dtoGroup.Description, IsPrivate = dtoGroup.IsPrivate };
+            var updatedGroup = await _service.Create(newGroup, userId);
 
-        // DELETE: api/Groups/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGroup(int id)
-        {
-            var @group = await _context.Groups.FindAsync(id);
-            if (@group == null)
+            if(updatedGroup == null)
             {
                 return NotFound();
             }
 
-            _context.Groups.Remove(@group);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(_mapper.Map<GroupCreateDTO>(updatedGroup));
         }
 
-        private bool GroupExists(int id)
+        /// <summary>
+        /// Api endpoint api/Group/group_id/join which creates a new group
+        /// membership record of the requesting user if group is not private,
+        /// members can create membership records regardless
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost("{id}/join")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<GroupCreateMemberDTO>> PostGroupMember([FromRoute] int id)
         {
-            return _context.Groups.Any(e => e.Id == id);
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+            Group groupPrivacy = _context.Groups.Include(g=>g.Members).Where(g => g.Id == id).Single();
+            Group groupMembers = _context.Groups.Find(id);
+            bool isNotAMember = groupMembers.Members.Where(u => u.Id.Contains(userId)).Equals(true);
+            var groupNewUserList = await _service.AddUserToGroup(id, userId);
+
+            if (groupNewUserList == null)
+            {
+                return NotFound();
+            }
+            else if(groupPrivacy.IsPrivate == true && isNotAMember)
+            {
+                return new StatusCodeResult(403);
+            }
+
+            return Ok(_mapper.Map<GroupCreateMemberDTO>(groupNewUserList));
+
         }
     }
 }
