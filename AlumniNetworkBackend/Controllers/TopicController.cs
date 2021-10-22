@@ -46,7 +46,8 @@ namespace AlumniNetworkBackend.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
-            return _mapper.Map<List<TopicReadDTO>>(await _context.Topics.ToListAsync());
+            List<Topic> topics = await _service.GetAllTopics();
+            return _mapper.Map<List<TopicReadDTO>>(topics);
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace AlumniNetworkBackend.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicReadDTO>> GetTopic(int id)
         {
-            Topic topic = await _context.Topics.FindAsync(id);
+            Topic topic = await _service.GetTopicById(id);
 
             if (topic == null)
             {
@@ -69,38 +70,6 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<TopicReadDTO>(topic);
         }
 
-        // PUT: api/Topics/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> PutTopic(int id, Topic topic)
-        {
-            if (id != topic.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(topic).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TopicExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         // <summary>
         /// Endpoint api/Topics which posts a new Topic to database with name
         /// and description.
@@ -108,46 +77,34 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="dtoTopic"></param>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicCreateDTO>> PostTopic(TopicCreateDTO dtoTopic)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            User tempUser = await _context.Users.Where(u => u.Id == "1").FirstAsync();
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
             Topic newTopic = new() { Name = dtoTopic.Name, Description = dtoTopic.Description};
-            var updatedTopic = await _service.Create(newTopic, tempUser);
-            return _mapper.Map<TopicCreateDTO>(updatedTopic);
+            var updatedTopic = await _service.Create(newTopic, userId);
+
+            if (updatedTopic == null)
+            {
+                return NotFound();
+            }
+
+            return CreatedAtAction("GetTopic", new { id = domainTopic.Id }, _mapper.Map<TopicCreateDTO>(domainTopic));
         }
 
         // POST: api/Topics
         [HttpPost("{id}/join")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicCreateMemberDTO>> PostTopicMember([FromRoute] int id)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+            var topicNewUserList = await _service.AddUserToTopic(id, userId);
 
-            if (!TopicExists(id))
-            {
-                return new StatusCodeResult(404);
-            }
-            var user = await _context.Users.FindAsync(userId);
+            if (topicNewUserList == null)
+                return NotFound();
 
-            if (user == null)
-            {
-                return new StatusCodeResult(404);
-            }
-  
-            var updatedTopicUsers = _context.Topics.Where(t => t.Id == id)
-                .SelectMany(u => u.Users)
-                .Append(user);
-            await _context.SaveChangesAsync();
-            
-
-            return Ok(updatedTopicUsers);
-        }
-        private bool TopicExists(int id)
-        {
-            return _context.Topics.Any(e => e.Id == id);
+            return Ok(_mapper.Map<TopicCreateMemberDTO>(topicNewUserList));
         }
     }
 }

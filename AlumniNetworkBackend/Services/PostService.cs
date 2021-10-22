@@ -1,6 +1,7 @@
 ﻿using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
 using AlumniNetworkBackend.Models.DTO.PostDTO;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,33 +18,15 @@ namespace AlumniNetworkBackend.Services
         }
         public async Task<Post> AddPostAsync(Post post)
         {
-            _context.Posts.Add(post);
+            var returningPost = _context.Posts.Add(post);
             await _context.SaveChangesAsync();
-            return post;
+            return returningPost.Entity;
         }
-
-        public Task findPostTarget(PostCreateDTO post)
-        {
-            if (post.TargetEvent != null)
-            {
-
-            } else if (post.TargetGroup != null)
-            {
-                
-            } else if (post.TargetTopic != null)
-            {
-
-            } else if (post.TargetUser != null)
-            {
-
-            }
-
-            throw new NotImplementedException();
-        }
-
+        
         public bool PostExists(int id)
         {
             return _context.Posts.Any(p => p.Id == id);
         }
+
     }
 }

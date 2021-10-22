@@ -16,10 +16,12 @@ namespace AlumniNetworkBackend.Models.Domain
 
         //One to many relationship with user to determine the sender 
         public string SenderId { get; set; }
+
         public User Sender { get; set; }
         //Nullable property which can be used to know if post is main or reply
         public int? ReplyParentId { get; set; }
-        public Post ReplyParent { get; set; }
+        public int? TargetPostId { get; set; }
+        public Post TargetPost { get; set; }
         //Nullable One to One relationship with user
         public string? TargetUserId { get; set; }
         public User TargetUser { get; set; }
