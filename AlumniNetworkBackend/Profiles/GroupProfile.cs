@@ -1,6 +1,7 @@
 ﻿using AlumniNetworkBackend.Models.DTO.GroupDTO;
+using AlumniNetworkBackend.Models.Domain;
 using AutoMapper;
-using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace AlumniNetworkBackend.Profiles
 {
@@ -8,10 +9,22 @@ namespace AlumniNetworkBackend.Profiles
     {
         public GroupProfile()
         {
-            CreateMap<Group, GroupReadDTO>().ReverseMap();
-            //.ForMember(gdto => gdto.Members, opt => opt
-            //.MapFrom(g => g.Members.Select(g => g.Id).ToArray());
-            CreateMap<GroupCreateDTO, Group>()
+            //Mapping Group <-> GroupReadDto
+            CreateMap<Group, GroupReadDTO>()
+            .ForMember(gdto => gdto.Members, opt => opt
+            .MapFrom(g => g.Members
+            .Select(g => g.Id)
+            .ToArray()));
+
+            //Mapping Group <-> GroupCreateMemberDto
+            CreateMap<Group, GroupCreateMemberDTO>()
+            .ForMember(gdto => gdto.Members, opt => opt
+            .MapFrom(g => g.Members
+            .Select(g => g.Id)
+            .ToArray()));
+
+            //Map Groupcreatedto <-> group
+            CreateMap<Group, GroupCreateDTO>()
                 .PreserveReferences()
                 .ReverseMap();
         }
