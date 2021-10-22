@@ -53,6 +53,7 @@ namespace AlumniNetworkBackend.Services
                 .Where(t => t.Id == topic.Id)
                 .FirstAsync();
 
+            Topic topicToUpdateUsers = await _context.Topics.Include(u => u.Users).Where(t => t.Id == topic.Id).FirstAsync();
             List<User> userList = new() { user };
             topicToUpdateUsers.Users = userList;
             await _context.SaveChangesAsync();

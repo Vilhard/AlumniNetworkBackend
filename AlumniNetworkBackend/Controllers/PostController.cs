@@ -9,6 +9,9 @@ using AutoMapper;
 using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.PostDTO;
 using AlumniNetworkBackend.Services;
+using System;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -29,22 +32,25 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/Posts
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<PostReadDTO>> GeUserGroupAndTopicPosts()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var userIsGroupMember = await _context.Groups.Where(g => g.Members.Any(u => u.Id == userId)).ToListAsync();
-            List<Post> GroupPosts = userIsGroupMember.SelectMany(p => p.Posts).ToList();
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
-            var userIsTopicMember = await _context.Topics.Where(t => t.Users.Any(u => u.Id == userId)).ToListAsync();
-            List<Post> TopicPosts = userIsTopicMember.SelectMany(p => p.Posts).ToList();
+            //var userTopicPosts =  await _context.Posts
+            //    .Include(t => t.TargetTopic).ThenInclude(u => u.Users)
+            //.Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
+            var userTopicPosts = await _context.Posts.Include(p => p.TargetPosts).ToListAsync();
 
-            var filteredPostList = new
-            {
-                GroupPosts,
-                TopicPosts
-            };
+            //var userGroupPosts = await _context.Posts
+            //    .Include(t => t.TargetGroup).ToListAsync();
+            //.Where(u => u.TargetGroup.Members.Any(x => x.Id == userId))
 
-            return _mapper.Map<PostReadDTO>(filteredPostList);
+            List<Post> combined = new();
+            //combined.Add(userTopicPosts);
+          
+
+            return _mapper.Map<PostReadDTO>(combined);
         }
         // GET: api/Posts/user
         [HttpGet("/user")]
@@ -164,24 +170,33 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Posts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PostCreateDTO>> PostPost(PostCreateDTO dtoPost)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<PostReadDTO>> PostPost(PostCreateDTO dtoPost)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            Post domainPost = _mapper.Map<Post>(dtoPost);
-            await _postService.AddPostAsync(domainPost);
-            //if (dtoPost.TargetGroup != null)
-            //{
-            //    bool canPost = _context.Groups.Where(g => g.Members.Any(u => u.Id == userId)).Equals(true);
-            //    if (canPost)
-            //    {
-            //       await _postService.AddPostAsync(domainPost);
-            //    }
-            //    else
-            //    {
-            //        return new StatusCodeResult(403);
-            //    }
-            return CreatedAtAction("GetPost", new { id = domainPost.Id }, _mapper.Map<PostReadCreateDTO>(domainPost));
-
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+            bool isMember = dtoPost.Members.Any(u => u.Id == userId);
+            
+           if (isMember)
+            {
+                    Post post = new()
+                    {
+                        SenderId = userId,
+                        Text = dtoPost.Text,
+                        TargetEventId = dtoPost?.TargetEvent,
+                        TargetGroupId = dtoPost?.TargetGroup,
+                        TargetTopicId = dtoPost?.TargetTopic,
+                        ReplyParentId = dtoPost.ReplyParentId,
+                        TargetUserId = dtoPost?.TargetUser,
+                        TimeStamp = DateTime.Now
+                    };
+                    var result = await _postService.AddPostAsync(post);
+                    if (result == null)
+                        return BadRequest();
+                return _mapper.Map<PostReadDTO>(result);
+            } else 
+            {
+            return new StatusCodeResult(403);
+            }
         }
-    }
+    } 
 }

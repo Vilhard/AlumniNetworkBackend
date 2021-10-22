@@ -90,7 +90,7 @@ namespace AlumniNetworkBackend.Controllers
                 return NotFound();
             }
 
-            return _mapper.Map<TopicCreateDTO>(updatedTopic);
+            return CreatedAtAction("GetTopic", new { id = domainTopic.Id }, _mapper.Map<TopicCreateDTO>(domainTopic));
         }
 
         // POST: api/Topics

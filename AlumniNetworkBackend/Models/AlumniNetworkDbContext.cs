@@ -25,7 +25,7 @@ namespace AlumniNetworkBackend.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
+            optionsBuilder.UseSqlServer("Data Source=5CG05206QY\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -183,7 +183,7 @@ namespace AlumniNetworkBackend.Models
                 Text = "What's up everybody?",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 SenderId = "1",
-                ReplyParentId = null,
+               // ReplyParentId = null,
                 TargetEventId = null,
                 TargetGroupId = null,
                 TargetTopicId = null,
@@ -195,7 +195,7 @@ namespace AlumniNetworkBackend.Models
                 Text = "Feeling good!",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 SenderId = "2",
-                ReplyParentId = 1,
+               // ReplyParentId = 1,
                 TargetEventId = null,
                 TargetGroupId = null,
                 TargetTopicId = null,
@@ -207,7 +207,7 @@ namespace AlumniNetworkBackend.Models
                 Text = "Today's going to be a good day!",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 SenderId = "3",
-                ReplyParentId = 1,
+               // ReplyParentId = 1,
                 TargetEventId = null,
                 TargetGroupId = null,
                 TargetTopicId = null,
@@ -219,7 +219,7 @@ namespace AlumniNetworkBackend.Models
                 Text = "Is there any good Events to attend anytime soon?",
                 TimeStamp = new DateTime(2021, 12, 12, 19, 30, 0),
                 SenderId = "4",
-                ReplyParentId = null,
+               // ReplyParentId = null,
                 TargetEventId = null,
                 TargetGroupId = null,
                 TargetTopicId = null,
@@ -414,6 +414,7 @@ namespace AlumniNetworkBackend.Models
                .HasOne(p => p.Sender)
                .WithMany(u => u.Posts)
                .HasForeignKey(e => e.SenderId);
+
         }
 
     }
