@@ -168,56 +168,31 @@ namespace AlumniNetworkBackend.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<PostReadDTO>> PostPost(PostCreateDTO dtoPost)
+        public async Task<ActionResult<PostCreateDTO>> PostPost(PostCreateDTO dtoPost)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+            bool isMember = dtoPost.Members.Any(u => u.Id == userId);
 
-            if (dtoPost.TargetGroup != null)
+           if (isMember)
             {
-                var addPostToGroup = await _postService.AddPostToGroup(dtoPost, userId, (int)dtoPost.TargetGroup);
-                if (addPostToGroup == null)
-                    return BadRequest();
-
-                return  _mapper.Map<PostReadDTO>(addPostToGroup);
-            }
-            else if (dtoPost.TargetTopic != null)
-            {
-                Post post = new Post
+                Post post = new()
                 {
                     SenderId = userId,
-                    TargetTopicId = dtoPost.TargetTopic,
+                    Text = dtoPost.Text,
+                    ReplyParentId = dtoPost?.ReplyParentId,
+                    TargetGroupId = dtoPost?.TargetGroup,
+                    TargetEventId = dtoPost?.TargetEvent,
+                    TargetTopicId = dtoPost?.TargetTopic,
+                    TargetPostId = dtoPost?.TargetPost,
+                    TargetUserId = dtoPost?.TargetUser,
                     TimeStamp = DateTime.Now
                 };
-                //return CreatedAtAction("GetPost", new { id = domainPost.Id }, _mapper.Map<PostReadCreateDTO>(domainPost));
-            } else if (dtoPost.TargetEvent != null)
-            {
-                Post post = new Post
-                {
-                    SenderId = userId,
-                    TargetEventId = dtoPost.TargetEvent,
-                    TimeStamp = DateTime.Now
-                };
-
-            } else if (dtoPost.TargetUser != null)
-            {
-                Post post = new Post
-                {
-                    SenderId = userId,
-                    TargetUserId = dtoPost.TargetUser,
-                    TimeStamp = DateTime.Now
-                };
-
-            } else if (dtoPost.TargetPost != null)
-            {
-                Post post = new Post
-                {
-                    SenderId = userId,
-                    TargetPostId = dtoPost.TargetPost,
-                    TimeStamp = DateTime.Now
-                };
+                var returningPost = _context.Posts.Add(post);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<PostCreateDTO>(returningPost.Entity);
 
             }
-            return NoContent();
+            return new StatusCodeResult(403);
         }
     } 
 }
