@@ -37,10 +37,10 @@ namespace AlumniNetworkBackend.Controllers
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
-            //var userTopicPosts =  await _context.Posts
-            //    .Include(t => t.TargetTopic).ThenInclude(u => u.Users)
-            //.Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
-            var userTopicPosts = await _context.Posts.Include(p => p.TargetPosts).ToListAsync();
+            var userTopicPosts = await _context.Posts
+                .Include(t => t.TargetTopic).ThenInclude(u => u.Users)
+            .Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
+           // var userTopicPosts = await _context.Posts.Include(p => p.TargetPosts).ToListAsync();
 
             //var userGroupPosts = await _context.Posts
             //    .Include(t => t.TargetGroup).ToListAsync();
