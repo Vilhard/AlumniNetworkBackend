@@ -24,16 +24,12 @@ namespace AlumniNetworkBackend.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     public class TopicController : ControllerBase
     {
-        private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ITopicService _service;
 
-        public TopicController(ITopicService service, AlumniNetworkDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public TopicController(ITopicService service, IMapper mapper)
         {
-            _context = context;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
             _service = service;
         }
 
