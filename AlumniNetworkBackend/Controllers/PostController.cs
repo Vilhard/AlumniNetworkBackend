@@ -79,10 +79,15 @@ namespace AlumniNetworkBackend.Controllers
             {
                 return NotFound();
             }
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+
             var postsFromSpecificUser = await _context.Posts
                 .Include(u => u.TargetUser)
                 .ThenInclude(x => x.Posts)
-                .Where(u => u.TargetUserId == id).OrderByDescending(x => x.TimeStamp).ToListAsync();
+                .ThenInclude(s => s.Sender)
+                .Where(u => u.TargetUserId == userId)
+                .Where(t => t.SenderId == id)
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
             return _mapper.Map<List<PostReadDTO>>(postsFromSpecificUser);
         }
@@ -142,23 +147,26 @@ namespace AlumniNetworkBackend.Controllers
         // PUT: api/Post/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, PostUpdateDTO dtoPost)
+        public async Task<ActionResult<PostReadDTO>> PutPost(int id, PostUpdateDTO dtoPost)
         {
             if (id != dtoPost.Id)
             {
                 return BadRequest();
             }
-
+            if (dtoPost.TargetEvent != null || dtoPost.TargetGroup != null || dtoPost.TargetTopic !=null 
+                || dtoPost.ReplyParentId != null || dtoPost.TargetUser != null|| dtoPost.TargetPost != null)
+            {
+                return new StatusCodeResult(403);
+            }
             if (!_postService.PostExists(id))
             {
                 return NotFound();
             }
 
-
             Post domainPost = _mapper.Map<Post>(dtoPost);
-            await _postService.PostUpdateAsync(domainPost);
+           var updatePost = await _postService.PostUpdateAsync(id,domainPost);
 
-            return NoContent();
+            return _mapper.Map<PostReadDTO>(updatePost);
         }
 
         // POST: api/Posts
