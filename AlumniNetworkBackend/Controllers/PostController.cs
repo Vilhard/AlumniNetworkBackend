@@ -53,7 +53,7 @@ namespace AlumniNetworkBackend.Controllers
         // GET: api/Post/user
         [HttpGet("User")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<List<PostReadDirectDTO>>> GetUserDirectPosts()
+        public async Task<ActionResult<List<PostReadDTO>>> GetUserDirectPosts()
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
@@ -67,12 +67,12 @@ namespace AlumniNetworkBackend.Controllers
                 return NotFound();
             }
 
-            return _mapper.Map<List<PostReadDirectDTO>>(userDirectMessages);
+            return _mapper.Map<List<PostReadDTO>>(userDirectMessages);
         }
 
         // GET: api/Posts/user/user_id
         [HttpGet("User/{id}")]
-        public async Task<ActionResult<List<PostReadDirectDTO>>> GetSpecificDirectPostsFromUser(string id)
+        public async Task<ActionResult<List<PostReadDTO>>> GetSpecificDirectPostsFromUser(string id)
         {
            if (id == null)
             {
@@ -83,56 +83,55 @@ namespace AlumniNetworkBackend.Controllers
                 .ThenInclude(x => x.Posts)
                 .Where(u => u.TargetUserId == id).OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            return _mapper.Map<List<PostReadDirectDTO>>(postsFromSpecificUser);
+            return _mapper.Map<List<PostReadDTO>>(postsFromSpecificUser);
         }
 
         // GET: api/Posts/Group/:group_id
         [HttpGet("Group/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromGroup(int id)
+        public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GetSpecificPostsFromGroup(int id)
         {
-            var postFromGroupAsTarget = await _context.Groups.Where(g => g.Id == id)
-                .SelectMany(p => p.Posts)
-                .Where(t => t.TargetGroup.Id == id)
-                .ToListAsync();
+            var postsFromGroup = await _context.Posts.Include(t => t.TargetGroup)
+                .ThenInclude(p => p.Posts)
+                .Where(u => u.TargetGroupId == id).OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            if (postFromGroupAsTarget == null)
+            if (postsFromGroup == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(postFromGroupAsTarget);
+            return _mapper.Map<List<PostReadTopicGroupDTO>>(postsFromGroup);
         }
         // GET: api/Posts/Topic/:topic_id
         [HttpGet("Topic/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromTopic(int id)
+        public async Task<ActionResult<List<PostReadTopicDTO>>> GetSpecificPostsFromTopic(int id)
         {
-            var postFromTopicAsTarget = await _context.Topics.Where(t => t.Id == id)
-                .SelectMany(p => p.Posts)
-                .Where(tt => tt.TargetTopic.Id == id)
-                .ToListAsync();
+            var postsFromTopic = await _context.Posts.Include(t => t.TargetTopic)
+                .ThenInclude(p => p.Posts)
+                .Where(u => u.TargetTopicId == id)
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            if (postFromTopicAsTarget == null)
+            if (postsFromTopic == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(postFromTopicAsTarget);
+            return _mapper.Map<List<PostReadTopicDTO>>(postsFromTopic);
         }
         // GET: api/Posts/Event/:event_id
         [HttpGet("Event/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromEvent(int id)
+        public async Task<ActionResult<List<PostReadEventDTO>>> GetSpecificDirectPostsFromEvent(int id)
         {
-            var postFromEventAsTarget = await _context.Events.Where(e => e.Id == id)
-                .SelectMany(p => p.Posts)
-                .Where(te => te.TargetEvent.Id == id)
-                .ToListAsync();
+            var postsFromEvent = await _context.Posts.Include(t => t.TargetEvent)
+                .ThenInclude(p => p.Posts)
+                .Where(u => u.TargetEventId == id)
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            if (postFromEventAsTarget == null)
+            if (postsFromEvent == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(postFromEventAsTarget);
+            return _mapper.Map<List<PostReadEventDTO>>(postsFromEvent);
         }
 
         // PUT: api/Posts/5
