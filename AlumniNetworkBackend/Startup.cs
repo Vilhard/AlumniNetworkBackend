@@ -63,6 +63,7 @@ namespace AlumniNetworkBackend
             services.AddScoped<ITopicService, TopicService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddHttpContextAccessor();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers();
