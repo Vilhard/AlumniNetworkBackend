@@ -30,7 +30,7 @@ namespace AlumniNetworkBackend.Controllers
             _postService = postService;
         }
 
-        // GET: api/Posts
+        // GET: api/Post
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GeUserGroupAndTopicPosts()
@@ -50,39 +50,40 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
-        // GET: api/Posts/user
-        [HttpGet("/user")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetUserDirectPost()
+        // GET: api/Post/user
+        [HttpGet("User")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadDirectDTO>>> GetUserDirectPosts()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var userPosts = await _context.Users.Where(u => u.Id == userId)
-                .SelectMany(p => p.Posts)
-                .Where(t => t.TargetUser.Id == userId)
-                .ToListAsync();
-            if (userPosts == null)
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+
+            var userDirectMessages = await _context.Posts
+                .Include(u => u.TargetUser)
+                .ThenInclude(x => x.Posts)
+                .Where(u => u.TargetUserId == userId).OrderByDescending(x => x.TimeStamp).ToListAsync();
+
+            if (userDirectMessages == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(userPosts);
+            return _mapper.Map<List<PostReadDirectDTO>>(userDirectMessages);
         }
 
         // GET: api/Posts/user/user_id
-        [HttpGet("user/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromUser(string id)
+        [HttpGet("User/{id}")]
+        public async Task<ActionResult<List<PostReadDirectDTO>>> GetSpecificDirectPostsFromUser(string id)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var postsFromSpecificUser = await _context.Users.Where(u => u.Id == userId)
-                .SelectMany(p => p.Posts)
-                .Where(t => t.SenderId == id)
-                .ToListAsync();
-
-            if (postsFromSpecificUser == null)
+           if (id == null)
             {
                 return NotFound();
             }
+            var postsFromSpecificUser = await _context.Posts
+                .Include(u => u.TargetUser)
+                .ThenInclude(x => x.Posts)
+                .Where(u => u.TargetUserId == id).OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            return _mapper.Map<PostReadDirectDTO>(postsFromSpecificUser);
+            return _mapper.Map<List<PostReadDirectDTO>>(postsFromSpecificUser);
         }
 
         // GET: api/Posts/Group/:group_id
