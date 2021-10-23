@@ -38,13 +38,14 @@ namespace AlumniNetworkBackend.Controllers
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
             var userTopicPosts = await _context.Posts
-                .Include(t => t.TargetTopic).ThenInclude(u => u.Users)
-            .Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
+                .Include(t => t.TargetTopic)
+                .ThenInclude(u => u.Users)
+                .Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
 
             var userGroupPosts = await _context.Posts
-                .Include(t => t.TargetGroup).ThenInclude(u => u.Members)
-            .Where(u => u.TargetGroup.Members.Any(x => x.Id == userId)).ToListAsync();
-
+                .Include(t => t.TargetGroup)
+                .ThenInclude(u => u.Members)
+                .Where(u => u.TargetGroup.Members.Any(x => x.Id == userId)).ToListAsync();
 
             var combinedList = userTopicPosts.Concat(userGroupPosts).OrderByDescending(x => x.TimeStamp).ToList();
 
@@ -90,9 +91,11 @@ namespace AlumniNetworkBackend.Controllers
         [HttpGet("Group/{id}")]
         public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GetSpecificPostsFromGroup(int id)
         {
-            var postsFromGroup = await _context.Posts.Include(t => t.TargetGroup)
+            var postsFromGroup = await _context.Posts
+                .Include(t => t.TargetGroup)
                 .ThenInclude(p => p.Posts)
-                .Where(u => u.TargetGroupId == id).OrderByDescending(x => x.TimeStamp).ToListAsync();
+                .Where(u => u.TargetGroupId == id)
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
             if (postsFromGroup == null)
             {
@@ -105,7 +108,8 @@ namespace AlumniNetworkBackend.Controllers
         [HttpGet("Topic/{id}")]
         public async Task<ActionResult<List<PostReadTopicDTO>>> GetSpecificPostsFromTopic(int id)
         {
-            var postsFromTopic = await _context.Posts.Include(t => t.TargetTopic)
+            var postsFromTopic = await _context.Posts
+                .Include(t => t.TargetTopic)
                 .ThenInclude(p => p.Posts)
                 .Where(u => u.TargetTopicId == id)
                 .OrderByDescending(x => x.TimeStamp).ToListAsync();
@@ -121,7 +125,8 @@ namespace AlumniNetworkBackend.Controllers
         [HttpGet("Event/{id}")]
         public async Task<ActionResult<List<PostReadEventDTO>>> GetSpecificDirectPostsFromEvent(int id)
         {
-            var postsFromEvent = await _context.Posts.Include(t => t.TargetEvent)
+            var postsFromEvent = await _context.Posts
+                .Include(t => t.TargetEvent)
                 .ThenInclude(p => p.Posts)
                 .Where(u => u.TargetEventId == id)
                 .OrderByDescending(x => x.TimeStamp).ToListAsync();
@@ -134,33 +139,24 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<List<PostReadEventDTO>>(postsFromEvent);
         }
 
-        // PUT: api/Posts/5
+        // PUT: api/Post/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, Post post)
+        public async Task<IActionResult> PutPost(int id, PostUpdateDTO dtoPost)
         {
-            if (id != post.Id)
+            if (id != dtoPost.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(post).State = EntityState.Modified;
+            if (!_postService.PostExists(id))
+            {
+                return NotFound();
+            }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_postService.PostExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            Post domainPost = _mapper.Map<Post>(dtoPost);
+            await _postService.PostUpdateAsync(domainPost);
 
             return NoContent();
         }

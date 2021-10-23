@@ -13,6 +13,7 @@ namespace AlumniNetworkBackend.Profiles
             CreateMap<Post, PostReadDirectDTO>().ReverseMap();
             CreateMap<Post, PostReadTopicDTO>().ReverseMap();
             CreateMap<Post, PostReadEventDTO>().ReverseMap();
+            CreateMap<Post, PostUpdateDTO>().ReverseMap();
             CreateMap<Post, PostCreateDTO>()
                 .ForMember(dtop => dtop.TargetGroup, opt => opt.MapFrom(x => x.TargetGroupId))
                 .ForMember(dtop => dtop.TargetEvent, opt => opt.MapFrom(x => x.TargetEventId))

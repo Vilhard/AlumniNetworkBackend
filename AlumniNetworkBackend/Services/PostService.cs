@@ -40,6 +40,12 @@ namespace AlumniNetworkBackend.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task PostUpdateAsync(Post post)
+        {
+            _context.Entry(post).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
         public bool PostExists(int id)
         {
             return _context.Posts.Any(p => p.Id == id);
