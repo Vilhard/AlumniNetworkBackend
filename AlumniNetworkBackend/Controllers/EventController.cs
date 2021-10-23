@@ -10,11 +10,16 @@ using AlumniNetworkBackend.Models.Domain;
 using AutoMapper;
 using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.EventDTO;
+using System.Net.Mime;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json)]
     public class EventController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
@@ -32,47 +37,58 @@ namespace AlumniNetworkBackend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<EventForUserReadDTO>> GetEvents()
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<IEnumerable<EventReadDTO>>> GetEvents()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            var userBelongsToGroup = await _context.Groups
-                .Where(g => g.Members.Any(u => u.Id == userId))
-                .ToListAsync();
-
-            List<Event> GroupEvents = userBelongsToGroup
-                .SelectMany(e => e.Event)
+            List<Event> eventsForGroupAndTopic = _context.Events
+                .Where(e=>e.Group.Any(g=>g.Members.Any(m=>m.Id.Contains("2"))) || e.Topic.Any(g => g.Users.Any(m => m.Id.Contains("2"))))
                 .ToList();
 
-            var userBelongsToTopic = await _context.Topics
-                .Where(t => t.Users.Any(u => u.Id == userId))
-                .ToListAsync();
-
-            List<Event> TopicEvents = userBelongsToTopic
-                .SelectMany(e => e.Event)
-                .ToList();
-
-            var eventsForGroupsAndTopics = new
-            {
-                TopicEvents,
-                GroupEvents
-            };
-
-            return _mapper.Map<EventForUserReadDTO>(eventsForGroupsAndTopics);
+            return _mapper.Map<List<EventReadDTO>>(eventsForGroupAndTopic);
         }
 
-        // GET: api/Events/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Event>> GetEvent(int id)
+        // POST: api/Events
+        [HttpPost]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<EventCreateDTO>> PostNewEvent(EventCreateDTO dtoEvent)
         {
-            var @event = await _context.Events.FindAsync(id);
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            if (@event == null)
+            Event newEvent = new()
             {
-                return NotFound();
+                Name = dtoEvent.Name,
+                LastUpdated = DateTime.Now,
+                Description = dtoEvent.Description,
+                AllowGuests = dtoEvent.AllowGuests,
+                BannerImg = dtoEvent.BannerImg,
+                StartTime = dtoEvent.StartTime,
+                EndTime = dtoEvent.EndTime,
+                CreatedById = "4",
+                TargetGroupId = dtoEvent.TargetGroupId,
+                TargetTopicId = dtoEvent.TargetTopicId
+            };
+
+            //bool isNotTopicMember = _context.Topics
+            //    .Where(t => t.Id == newEvent.TargetTopicId)
+            //    .Where(t => t.Users.Any(u => u.Id != "4"));
+
+            if(newEvent.Group.Where(g => g.Id == newEvent.TargetGroupId).Any(m => m.Members.Any(m=>m.Id != "4")) && newEvent.Topic.Where(g => g.Id == newEvent.TargetTopicId).Any(m => m.Users.Any(u=>u.Id != "4")))
+            {
+                return new StatusCodeResult(403);
             }
 
-            return @event;
+            //if (_context.Events.Where(e => e.Group.Any(g => g.Members.Any(m => m.Id.Contains("4"))).Equals(true) || e.Topic.Any(g => g.Users.Any(m => m.Id.Contains("4")))).Equals(true))
+            //{
+            Event domainEvent = _mapper.Map<Event>(dtoEvent);
+                _context.Events.Add(newEvent);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetEvents", new { id = domainEvent.Id }, dtoEvent);
+            //}
+
+            //return new StatusCodeResult(403);
         }
 
         // PUT: api/Events/5
@@ -106,16 +122,16 @@ namespace AlumniNetworkBackend.Controllers
             return NoContent();
         }
 
-        // POST: api/Events
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
-        {
-            _context.Events.Add(@event);
-            await _context.SaveChangesAsync();
+        //// POST: api/Events
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<Event>> PostEvent(Event @event)
+        //{
+        //    _context.Events.Add(@event);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
-        }
+        //    return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
+        //}
         // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         //[HttpPost("{event_id}/invite/group/{group_id}")]

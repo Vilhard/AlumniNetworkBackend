@@ -19,6 +19,8 @@ namespace AlumniNetworkBackend.Models.Domain
         public DateTime EndTime { get; set; }
         
         //Relationships
+        public int TargetTopicId { get; set; }
+        public int TargetGroupId { get; set; }         
         //One to many relationship with user
         public string CreatedById { get; set; }
         public User CreatedBy { get; set; }
