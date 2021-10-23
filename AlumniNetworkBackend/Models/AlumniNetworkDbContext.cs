@@ -415,6 +415,8 @@ namespace AlumniNetworkBackend.Models
                .WithMany(u => u.Posts)
                .HasForeignKey(e => e.SenderId);
 
+            modelBuilder.Entity<Post>()
+               .HasIndex(u => u.TargetUserId).IsUnique(false);
         }
 
     }
