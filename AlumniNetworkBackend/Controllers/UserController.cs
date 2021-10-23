@@ -58,7 +58,7 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<UserReadDTO>> GetUserById(string id)
         {
             var user = await _service.GetUser(id);
@@ -74,7 +74,7 @@ namespace AlumniNetworkBackend.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=
         [HttpPut("{id}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<UserUpdateDTO>> UpdateUser(string id, UserUpdateDTO dtoUser)
         {
             User user = _mapper.Map<User>(dtoUser);
@@ -91,7 +91,7 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<User>> PostUser(UserCreateDTO dtoUser)
         {
             User domainUser = _mapper.Map<User>(dtoUser);

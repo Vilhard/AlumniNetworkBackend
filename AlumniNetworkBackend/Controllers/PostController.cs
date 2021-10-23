@@ -73,6 +73,7 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/Posts/user/user_id
         [HttpGet("User/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetSpecificDirectPostsFromUser(string id)
         {
            if (id == null)
@@ -94,6 +95,7 @@ namespace AlumniNetworkBackend.Controllers
 
         // GET: api/Posts/Group/:group_id
         [HttpGet("Group/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GetSpecificPostsFromGroup(int id)
         {
             var postsFromGroup = await _context.Posts
@@ -111,6 +113,7 @@ namespace AlumniNetworkBackend.Controllers
         }
         // GET: api/Posts/Topic/:topic_id
         [HttpGet("Topic/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicDTO>>> GetSpecificPostsFromTopic(int id)
         {
             var postsFromTopic = await _context.Posts
@@ -128,6 +131,7 @@ namespace AlumniNetworkBackend.Controllers
         }
         // GET: api/Posts/Event/:event_id
         [HttpGet("Event/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadEventDTO>>> GetSpecificDirectPostsFromEvent(int id)
         {
             var postsFromEvent = await _context.Posts
@@ -147,6 +151,7 @@ namespace AlumniNetworkBackend.Controllers
         // PUT: api/Post/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<PostReadDTO>> PutPost(int id, PostUpdateDTO dtoPost)
         {
             if (id != dtoPost.Id)
