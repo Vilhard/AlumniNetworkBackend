@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AlumniNetworkBackend.Models.DTO.UserDTO
 {
-    public class UserTestDTO
+    public class UserIdNameDTO
     {
         public string Id { get; set; }
         public string Username { get; set; }

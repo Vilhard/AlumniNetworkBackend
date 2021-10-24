@@ -24,16 +24,12 @@ namespace AlumniNetworkBackend.Controllers
     [Consumes(MediaTypeNames.Application.Json)]
     public class TopicController : ControllerBase
     {
-        private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ITopicService _service;
 
-        public TopicController(ITopicService service, AlumniNetworkDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public TopicController(ITopicService service, IMapper mapper)
         {
-            _context = context;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
             _service = service;
         }
 
@@ -43,7 +39,7 @@ namespace AlumniNetworkBackend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
             List<Topic> topics = await _service.GetAllTopics();
@@ -57,7 +53,7 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicReadDTO>> GetTopic(int id)
         {
             Topic topic = await _service.GetTopicById(id);

@@ -10,6 +10,7 @@ namespace AlumniNetworkBackend.Services
     public interface IPostService
     {
         public Task<Post> AddPostAsync(Post post);
+        public Task<Post> PostUpdateAsync(int id, Post post);
         public bool PostExists(int id);
     }
 }

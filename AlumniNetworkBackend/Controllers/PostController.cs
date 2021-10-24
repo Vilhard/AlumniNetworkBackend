@@ -29,145 +29,182 @@ namespace AlumniNetworkBackend.Controllers
             _mapper = mapper;
             _postService = postService;
         }
-
-        // GET: api/Posts
+        /// <summary>
+        /// Api endpoint GET: api/post returns all posts to topics and groups which the requesting user is a member of
+        /// </summary>
+        /// <returns></returns>
+        // GET: api/Post
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<PostReadDTO>> GeUserGroupAndTopicPosts()
+        public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GeUserGroupAndTopicPosts()
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
-            //var userTopicPosts =  await _context.Posts
-            //    .Include(t => t.TargetTopic).ThenInclude(u => u.Users)
-            //.Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
-            var userTopicPosts = await _context.Posts.Include(p => p.TargetPosts).ToListAsync();
+            var userTopicPosts = await _context.Posts
+                .Include(t => t.TargetTopic)
+                .ThenInclude(u => u.Users)
+                .Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
 
-            //var userGroupPosts = await _context.Posts
-            //    .Include(t => t.TargetGroup).ToListAsync();
-            //.Where(u => u.TargetGroup.Members.Any(x => x.Id == userId))
+            var userGroupPosts = await _context.Posts
+                .Include(t => t.TargetGroup)
+                .ThenInclude(u => u.Members)
+                .Where(u => u.TargetGroup.Members.Any(x => x.Id == userId)).ToListAsync();
 
-            List<Post> combined = new();
-            //combined.Add(userTopicPosts);
-          
+            var combinedList = userTopicPosts.Concat(userGroupPosts).OrderByDescending(x => x.TimeStamp).ToList();
 
-            return _mapper.Map<PostReadDTO>(combined);
+            return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
-        // GET: api/Posts/user
-        [HttpGet("/user")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetUserDirectPost()
+        /// <summary>
+        /// Api endpoint GET: api/post/user returns all direct posts that were send to the requesting user
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("user")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadDTO>>> GetUserDirectPosts()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var userPosts = await _context.Users.Where(u => u.Id == userId)
-                .SelectMany(p => p.Posts)
-                .Where(t => t.TargetUser.Id == userId)
-                .ToListAsync();
-            if (userPosts == null)
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+
+            var userDirectMessages = await _context.Posts
+                .Include(u => u.TargetUser)
+                .ThenInclude(x => x.Posts)
+                .Where(u => u.TargetUserId == userId).OrderByDescending(x => x.TimeStamp).ToListAsync();
+
+            if (userDirectMessages == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(userPosts);
+            return _mapper.Map<List<PostReadDTO>>(userDirectMessages);
         }
-
-        // GET: api/Posts/user/user_id
+        /// <summary>
+        /// Api endpoint GET: api/posts/user/:user_id returns all direct posts from specific user that were send to the requesting user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("user/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromUser(string id)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadDTO>>> GetSpecificDirectPostsFromUser(string id)
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var postsFromSpecificUser = await _context.Users.Where(u => u.Id == userId)
-                .SelectMany(p => p.Posts)
+           if (id == null)
+            {
+                return NotFound();
+            }
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+
+            var postsFromSpecificUser = await _context.Posts
+                .Include(u => u.TargetUser)
+                .ThenInclude(x => x.Posts)
+                .ThenInclude(s => s.Sender)
+                .Where(u => u.TargetUserId == userId)
                 .Where(t => t.SenderId == id)
-                .ToListAsync();
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            if (postsFromSpecificUser == null)
-            {
-                return NotFound();
-            }
-
-            return _mapper.Map<PostReadDirectDTO>(postsFromSpecificUser);
+            return _mapper.Map<List<PostReadDTO>>(postsFromSpecificUser);
         }
-
-        // GET: api/Posts/Group/:group_id
-        [HttpGet("Group/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromGroup(int id)
+        /// <summary>
+        /// Api emdpoint api/post/group/:group_id returns a list of posts that were sent with the described :group_id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("group/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GetSpecificPostsFromGroup(int id)
         {
-            var postFromGroupAsTarget = await _context.Groups.Where(g => g.Id == id)
-                .SelectMany(p => p.Posts)
-                .Where(t => t.TargetGroup.Id == id)
-                .ToListAsync();
+            var postsFromGroup = await _context.Posts
+                .Include(t => t.TargetGroup)
+                .ThenInclude(p => p.Posts)
+                .Where(u => u.TargetGroupId == id)
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            if (postFromGroupAsTarget == null)
+            if (postsFromGroup == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(postFromGroupAsTarget);
+            return _mapper.Map<List<PostReadTopicGroupDTO>>(postsFromGroup);
         }
+        /// <summary>
+        /// Api emdpoint api/post/topic/:topic_id returns a list of posts that were sent with the described :topic_id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: api/Posts/Topic/:topic_id
-        [HttpGet("Topic/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromTopic(int id)
+        [HttpGet("topic/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadTopicDTO>>> GetSpecificPostsFromTopic(int id)
         {
-            var postFromTopicAsTarget = await _context.Topics.Where(t => t.Id == id)
-                .SelectMany(p => p.Posts)
-                .Where(tt => tt.TargetTopic.Id == id)
-                .ToListAsync();
+            var postsFromTopic = await _context.Posts
+                .Include(t => t.TargetTopic)
+                .ThenInclude(p => p.Posts)
+                .Where(u => u.TargetTopicId == id)
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            if (postFromTopicAsTarget == null)
+            if (postsFromTopic == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(postFromTopicAsTarget);
+            return _mapper.Map<List<PostReadTopicDTO>>(postsFromTopic);
         }
-        // GET: api/Posts/Event/:event_id
-        [HttpGet("Event/{id}")]
-        public async Task<ActionResult<PostReadDirectDTO>> GetSpecificDirectPostsFromEvent(int id)
+        /// <summary>
+        ///  Api emdpoint api/post/event/:event_id returns a list of posts that were sent with the described :event_id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("event/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadEventDTO>>> GetSpecificDirectPostsFromEvent(int id)
         {
-            var postFromEventAsTarget = await _context.Events.Where(e => e.Id == id)
-                .SelectMany(p => p.Posts)
-                .Where(te => te.TargetEvent.Id == id)
-                .ToListAsync();
+            var postsFromEvent = await _context.Posts
+                .Include(t => t.TargetEvent)
+                .ThenInclude(p => p.Posts)
+                .Where(u => u.TargetEventId == id)
+                .OrderByDescending(x => x.TimeStamp).ToListAsync();
 
-            if (postFromEventAsTarget == null)
+            if (postsFromEvent == null)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<PostReadDirectDTO>(postFromEventAsTarget);
+            return _mapper.Map<List<PostReadEventDTO>>(postsFromEvent);
         }
 
-        // PUT: api/Posts/5
+        /// <summary>
+        /// Updates an existing post.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dtoPost"></param>
+        /// <returns></returns>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, Post post)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<PostReadDTO>> PutPost(int id, PostUpdateDTO dtoPost)
         {
-            if (id != post.Id)
+            if (id != dtoPost.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(post).State = EntityState.Modified;
-
-            try
+            if (dtoPost.TargetEvent != null || dtoPost.TargetGroup != null || dtoPost.TargetTopic !=null 
+                || dtoPost.ReplyParentId != null || dtoPost.TargetUser != null|| dtoPost.TargetPost != null)
             {
-                await _context.SaveChangesAsync();
+                return new StatusCodeResult(403);
             }
-            catch (DbUpdateConcurrencyException)
+            if (!_postService.PostExists(id))
             {
-                if (!_postService.PostExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
-            return NoContent();
+            Post domainPost = _mapper.Map<Post>(dtoPost);
+           var updatePost = await _postService.PostUpdateAsync(id,domainPost);
+
+            return _mapper.Map<PostReadDTO>(updatePost);
         }
 
-        // POST: api/Posts
+        /// <summary>
+        /// Creates a new post. Posts can be only posted to members that the user is member of or as a direct message to other users
+        /// </summary>
+        /// <param name="dtoPost"></param>
+        /// <returns></returns>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
