@@ -3,11 +3,14 @@ using AlumniNetworkBackend.Models.Domain;
 using AlumniNetworkBackend.Models.DTO.EventDTO;
 using AlumniNetworkBackend.Models.DTO.RSVPDTO;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Mime;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -35,13 +38,13 @@ namespace AlumniNetworkBackend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<IEnumerable<EventReadDTO>>> GetEvents()
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
             List<Event> eventsForGroupAndTopic = _context.Events
-                .Where(e=>e.Group.Any(g=>g.Members.Any(m=>m.Id.Contains("2"))) || e.Topic.Any(g => g.Users.Any(m => m.Id.Contains("2"))))
+                .Where(e=>e.Group.Any(g=>g.Members.Any(m=>m.Id.Contains(userId))) || e.Topic.Any(g => g.Users.Any(m => m.Id.Contains(userId))))
                 .ToList();
 
             return _mapper.Map<List<EventReadDTO>>(eventsForGroupAndTopic);
@@ -54,7 +57,7 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="dtoEvent"></param>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventCreateDTO>> PostNewEvent(EventCreateDTO dtoEvent)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
@@ -68,19 +71,19 @@ namespace AlumniNetworkBackend.Controllers
                 BannerImg = dtoEvent.BannerImg,
                 StartTime = dtoEvent.StartTime,
                 EndTime = dtoEvent.EndTime,
-                CreatedById = "4",
+                CreatedById = userId,
                 TargetGroupId = dtoEvent.TargetGroupId,
                 TargetTopicId = dtoEvent.TargetTopicId
             };
 
             bool isNotTopicMember = _context.Topics
                 .Where(t => t.Id == dtoEvent.TargetTopicId)
-                .Where(t => t.Users.Any(u => u.Id == "4"))
+                .Where(t => t.Users.Any(u => u.Id == userId))
                 .Equals(false);
 
             bool isNotGroupMember = _context.Groups
                 .Where(g => g.Id == dtoEvent.TargetGroupId)
-                .Where(g => g.Members.Any(m => m.Id == "4"))
+                .Where(g => g.Members.Any(m => m.Id == userId))
                 .Equals(false);
 
             if ( isNotGroupMember == true && isNotTopicMember == true)
@@ -103,7 +106,7 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="dtoEvent"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventReadDTO>> PutPost(int id, EventUpdateDTO dtoEvent)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
@@ -113,7 +116,7 @@ namespace AlumniNetworkBackend.Controllers
             {
                 return BadRequest();
             }
-            if (thisEvent.CreatedById != "4")
+            if (thisEvent.CreatedById != userId)
             {
                 return new StatusCodeResult(403);
             }
@@ -149,14 +152,14 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="groupId"></param>
         /// <returns></returns>
         [HttpPost("{eventId}/invite/group/{groupId}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventReadDTO>> PostEventGroupInvite([FromRoute] int eventId, int groupId)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             var thisEvent = await _context.Events.Include(e=>e.Group).Where(g => g.Id == eventId).FirstAsync();
             var thisGroup = await _context.Groups.Where(m => m.Id == groupId).FirstAsync();
 
-            if (thisEvent.CreatedById != "2")
+            if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
                 return NotFound();
@@ -181,14 +184,14 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="groupId"></param>
         /// <returns></returns>
         [HttpDelete("{eventId}/invite/group/{groupId}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventReadDTO>> DeleteEventGroupInvite([FromRoute] int eventId, int groupId)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             var thisEvent = await _context.Events.Include(e => e.Group).Where(g => g.Id == eventId).FirstAsync();
             var thisGroup = await _context.Groups.Where(m => m.Id == groupId).FirstAsync();
 
-            if (thisEvent.CreatedById != "2")
+            if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
                 return NotFound();
@@ -213,14 +216,14 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="topicId"></param>
         /// <returns></returns>
         [HttpPost("{eventId}/invite/topic/{topicId}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventReadDTO>> PostEventTopicInvite([FromRoute] int eventId, int topicId)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             var thisEvent = await _context.Events.Include(e => e.Topic).Where(g => g.Id == eventId).FirstAsync();
             var thisTopic = await _context.Topics.Where(m => m.Id == topicId).FirstAsync();
 
-            if (thisEvent.CreatedById != "2")
+            if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
                 return NotFound();
@@ -245,14 +248,14 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="topicId"></param>
         /// <returns></returns>
         [HttpDelete("{eventId}/invite/topic/{topicId}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventReadDTO>> DeleteEventTopicInvite([FromRoute] int eventId, int topicId)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             var thisEvent = await _context.Events.Include(e => e.Topic).Where(g => g.Id == eventId).FirstAsync();
             var thisTopic = await _context.Topics.Where(m => m.Id == topicId).FirstAsync();
 
-            if (thisEvent.CreatedById != "2")
+            if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
                 return NotFound();
@@ -277,14 +280,14 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="usersId"></param>
         /// <returns></returns>
         [HttpPost("{eventId}/invite/user/{usersId}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventReadDTO>> PostEventUserInvite([FromRoute] int eventId, string usersId)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             var thisEvent = await _context.Events.Include(e => e.Users).Where(g => g.Id == eventId).FirstAsync();
             var thisUser = await _context.Users.Where(m => m.Id == usersId).FirstAsync();
 
-            if (thisEvent.CreatedById != "2")
+            if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
                 return NotFound();
@@ -309,14 +312,14 @@ namespace AlumniNetworkBackend.Controllers
         /// <param name="usersId"></param>
         /// <returns></returns>
         [HttpDelete("{eventId}/invite/user/{usersId}")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<EventReadDTO>> DeleteEventUserInvite([FromRoute] int eventId, string usersId)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             var thisEvent = await _context.Events.Include(e => e.Users).Where(g => g.Id == eventId).FirstAsync();
             var thisUser = await _context.Users.Where(m => m.Id == usersId).FirstAsync();
 
-            if (thisEvent.CreatedById != "2")
+            if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
                 return NotFound();
@@ -338,18 +341,18 @@ namespace AlumniNetworkBackend.Controllers
         /// event id
         /// </summary>
         /// <param name="eventId"></param>
-        /// <param name="usersId"></param>
+        /// <param name="dtoRsvp"></param>
         /// <returns></returns>
         [HttpPost("{eventId}/RSVP")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<RsvpDTO>> PostEventRSVP([FromRoute] int eventId, RsvpDTO dtoRsvp)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
             var thisEvent = await _context.Events.Include(e => e.Users).Include(e=>e.Group).Include(e=>e.Topic).Where(g => g.Id == eventId).FirstAsync();
-            var thisUser = await _context.Users.Where(u => u.Id == "2").FirstAsync();
+            var thisUser = await _context.Users.Where(u => u.Id == userId).FirstAsync();
             int thisRSVPQuestCount = _context.RSVP.Where(m => m.EventId == eventId).Count()+1;
-            var eventGroupMember = thisEvent.Group.Where(g => g.Members.Any(m => m.Id == "2"));
-            var eventTopicMember = thisEvent.Topic.Where(g => g.Users.Any(m => m.Id == "2"));
+            var eventGroupMember = thisEvent.Group.Where(g => g.Members.Any(m => m.Id == userId));
+            var eventTopicMember = thisEvent.Topic.Where(g => g.Users.Any(m => m.Id == userId));
 
             if (eventGroupMember == null || eventGroupMember == null)
                 return new StatusCodeResult(403);
