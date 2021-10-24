@@ -1,5 +1,6 @@
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Services;
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -61,6 +62,11 @@ namespace AlumniNetworkBackend
             });
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddMvc();
+            services.AddOptions();
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            services.AddInMemoryRateLimiting();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
             services.AddScoped<ITopicService, TopicService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IPostService, PostService>();
@@ -79,6 +85,7 @@ namespace AlumniNetworkBackend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseIpRateLimiting();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
