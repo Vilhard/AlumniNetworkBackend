@@ -17,10 +17,10 @@ namespace AlumniNetworkBackend.Models.Domain
         public string BannerImg { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        
+
         //Relationships
-        public int TargetTopicId { get; set; }
-        public int TargetGroupId { get; set; }         
+        public int? TargetTopicId { get; set; }
+        public int? TargetGroupId { get; set; }
         //One to many relationship with user
         public string CreatedById { get; set; }
         public User CreatedBy { get; set; }
@@ -29,7 +29,7 @@ namespace AlumniNetworkBackend.Models.Domain
         //Many to many relationship with Topic, joining table EventTopic
         public ICollection<Topic> Topic { get; set; }
         //Many to many relationship with Group, joining table EventGroup
-        public ICollection<Group> Group { get; set; }
+        public ICollection<Group> Group { get; set; } = new List<Group>();
         //One to Many relationship to Posts
         public ICollection<Post> Posts { get; set; }
         //Event can have many RSVPs

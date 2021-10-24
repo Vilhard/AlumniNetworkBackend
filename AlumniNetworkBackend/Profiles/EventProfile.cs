@@ -14,6 +14,14 @@ namespace AlumniNetworkBackend.Profiles
         {
             //Map event model to event create dto
             CreateMap<Event, EventCreateDTO>()
+                //.ForMember(gdto => gdto.Topic, opt => opt
+                //.MapFrom(g => g.Topic
+                //.Select(g => g.Id)
+                //.ToArray()))
+                //.ForMember(gdto => gdto.Group, opt => opt
+                //.MapFrom(g => g.Group
+                //.Select(g => g.Id)
+                //.ToArray()))
                 .ReverseMap();
 
             //Map event model to Event update dto

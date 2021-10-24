@@ -17,9 +17,7 @@ namespace AlumniNetworkBackend.Models.DTO.EventDTO
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         //Relationships/Audience
-        //Many to many relationship with Topic, joining table EventTopic
         public int TargetTopicId { get; set; }
-        //Many to many relationship with Group, joining table EventGroup
         public int TargetGroupId { get; set; }
     }
 }
