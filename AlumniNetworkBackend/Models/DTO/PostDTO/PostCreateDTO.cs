@@ -17,6 +17,6 @@ namespace AlumniNetworkBackend.Models.DTO.PostDTO
         public int? TargetGroup { get; set; }
         public int? TargetTopic { get; set; }
         public int? TargetEvent { get; set; }
-        public List<UserTestDTO> Members { get; set; }
+        public List<UserIdNameDTO> Members { get; set; }
     }
 }

@@ -17,6 +17,12 @@ namespace AlumniNetworkBackend.Services
         {
             _context = context;
         }
+        /// <summary>
+        /// Service handles adding post to context and and checking if it is a reply to specific post
+        /// in which case it is passed to helper service.
+        /// </summary>
+        /// <param name="post"></param>
+        /// <returns></returns>
         public async Task<Post> AddPostAsync(Post post)
         {
              var resultPost = _context.Posts.Add(post);
@@ -29,17 +35,29 @@ namespace AlumniNetworkBackend.Services
             }
             return post;
         }
+        /// <summary>
+        /// Service handles finding previously added post from context and ...
+        /// </summary>
+        /// <param name="post"></param>
+        /// <returns></returns>
         public async Task<bool> AddReplyParentList(Post post)
         {
             if (post == null)
                 return false;
-            Post prevPost = await _context.Posts.Where(p => p.Id == post.ReplyParentId).FirstAsync();
 
+            Post prevPost = await _context.Posts.Where(p => p.Id == post.ReplyParentId).FirstAsync();
             List<Post> listOfPosts = (List<Post>)prevPost.TargetPosts;
             listOfPosts.Add(post);
             await _context.SaveChangesAsync();
+
             return true;
         }
+        /// <summary>
+        /// Service handles updating parameter defined post's text field
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="post"></param>
+        /// <returns></returns>
         public async Task<Post> PostUpdateAsync(int id, Post post)
         {
             Post existingPost = await _context.Posts.FindAsync(id);
@@ -49,12 +67,14 @@ namespace AlumniNetworkBackend.Services
             await _context.SaveChangesAsync();
             return existingPost;
         }
-
+        /// <summary>
+        /// Service checks if post exists in the context
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public bool PostExists(int id)
         {
             return _context.Posts.Any(p => p.Id == id);
         }
-
-
     }
 }

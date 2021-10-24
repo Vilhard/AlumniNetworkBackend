@@ -11,7 +11,6 @@ namespace AlumniNetworkBackend.Models.DTO.GroupDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        [MaxLength(30)]
         public List<string> Members { get; set; }
     }
 }

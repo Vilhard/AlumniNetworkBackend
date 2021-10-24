@@ -12,6 +12,6 @@ namespace AlumniNetworkBackend.Models.DTO.TopicDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<UserReadDTO> Users { get; set; }
+        public List<UserIdNameDTO> Users { get; set; }
     }
 }

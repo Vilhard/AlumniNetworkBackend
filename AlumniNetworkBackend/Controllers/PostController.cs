@@ -29,7 +29,10 @@ namespace AlumniNetworkBackend.Controllers
             _mapper = mapper;
             _postService = postService;
         }
-
+        /// <summary>
+        /// Api endpoint GET: api/post returns all posts to topics and groups which the requesting user is a member of
+        /// </summary>
+        /// <returns></returns>
         // GET: api/Post
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -51,8 +54,11 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
-        // GET: api/Post/user
-        [HttpGet("User")]
+        /// <summary>
+        /// Api endpoint GET: api/post/user returns all direct posts that were send to the requesting user
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("user")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetUserDirectPosts()
         {
@@ -70,9 +76,12 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadDTO>>(userDirectMessages);
         }
-
-        // GET: api/Posts/user/user_id
-        [HttpGet("User/{id}")]
+        /// <summary>
+        /// Api endpoint GET: api/posts/user/:user_id returns all direct posts from specific user that were send to the requesting user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("user/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetSpecificDirectPostsFromUser(string id)
         {
@@ -92,9 +101,12 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadDTO>>(postsFromSpecificUser);
         }
-
-        // GET: api/Posts/Group/:group_id
-        [HttpGet("Group/{id}")]
+        /// <summary>
+        /// Api emdpoint api/post/group/:group_id returns a list of posts that were sent with the described :group_id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("group/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GetSpecificPostsFromGroup(int id)
         {
@@ -111,8 +123,13 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(postsFromGroup);
         }
+        /// <summary>
+        /// Api emdpoint api/post/topic/:topic_id returns a list of posts that were sent with the described :topic_id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: api/Posts/Topic/:topic_id
-        [HttpGet("Topic/{id}")]
+        [HttpGet("topic/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicDTO>>> GetSpecificPostsFromTopic(int id)
         {
@@ -129,8 +146,12 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadTopicDTO>>(postsFromTopic);
         }
-        // GET: api/Posts/Event/:event_id
-        [HttpGet("Event/{id}")]
+        /// <summary>
+        ///  Api emdpoint api/post/event/:event_id returns a list of posts that were sent with the described :event_id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("event/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadEventDTO>>> GetSpecificDirectPostsFromEvent(int id)
         {
@@ -148,7 +169,12 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<List<PostReadEventDTO>>(postsFromEvent);
         }
 
-        // PUT: api/Post/5
+        /// <summary>
+        /// Updates an existing post.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dtoPost"></param>
+        /// <returns></returns>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -174,7 +200,11 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<PostReadDTO>(updatePost);
         }
 
-        // POST: api/Posts
+        /// <summary>
+        /// Creates a new post. Posts can be only posted to members that the user is member of or as a direct message to other users
+        /// </summary>
+        /// <param name="dtoPost"></param>
+        /// <returns></returns>
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

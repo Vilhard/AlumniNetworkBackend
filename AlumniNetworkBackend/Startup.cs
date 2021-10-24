@@ -59,6 +59,7 @@ namespace AlumniNetworkBackend
                     ValidAudience = "account",
                 };
             });
+            services.AddRouting(options => options.LowercaseUrls = true);
             services.AddMvc();
             services.AddScoped<ITopicService, TopicService>();
             services.AddScoped<IGroupService, GroupService>();

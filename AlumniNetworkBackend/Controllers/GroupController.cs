@@ -45,11 +45,7 @@ namespace AlumniNetworkBackend.Controllers
         public async Task<ActionResult<IEnumerable<GroupReadDTO>>> GetGroups()
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
-
-            List<Group> filteredGroupList = await _context.Groups
-                .Include(g=>g.Members)
-                .Where(g => g.IsPrivate == false || g.Members.Any(u => u.Id.Contains(userId)))
-                .ToListAsync();
+            List<Group> filteredGroupList = await _service.GetAllGroups(userId);
 
             return _mapper.Map<List<GroupReadDTO>>(filteredGroupList);
         }
@@ -64,29 +60,20 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<GroupReadDTO>> GetGroupById(int id)
         {
-            try
-            {
-                string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
-
-                Group filteredGroup = _context.Groups
-                   .Include(g => g.Members)
-                   .Where(g => g.Id == id)
-                   .Where(g => g.IsPrivate == false || g.Members.Any(u => u.Id.Contains(userId)))
-                   .Single();
-
-                if(filteredGroup.IsPrivate == false || filteredGroup.Members.Any(u => u.Id == userId))
-                {
-                    return _mapper.Map<GroupReadDTO>(filteredGroup);
-                }
-                else
-                {
-                    return new StatusCodeResult(403);
-                }
-            }
-            catch
-            {
+            if (!_service.GroupExists(id))
                 return NotFound();
-            }
+
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+            Group filteredGroup = await _service.GetGroupById(id);
+
+            bool isMember = filteredGroup.Members.Any(u => u.Id == userId);
+            bool isPrivate = filteredGroup.IsPrivate == true;
+
+            if (isPrivate && !isMember)
+            {
+                return new StatusCodeResult(403);
+            };
+            return _mapper.Map<GroupReadDTO>(filteredGroup);
         }
 
         // <summary>
