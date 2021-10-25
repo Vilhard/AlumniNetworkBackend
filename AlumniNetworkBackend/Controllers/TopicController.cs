@@ -15,6 +15,7 @@ using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.UserDTO;
 using AlumniNetworkBackend.Services;
 using System.Net.Mime;
+using Microsoft.AspNetCore.Cors;
 
 namespace AlumniNetworkBackend.Controllers
 {
@@ -88,7 +89,11 @@ namespace AlumniNetworkBackend.Controllers
 
             return CreatedAtAction("GetTopic", new { id = updatedTopic.Id }, _mapper.Map<TopicCreateDTO>(updatedTopic));
         }
-
+        /// <summary>
+        /// Creates a new topic membership for the requesting user to referenced Topic.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // POST: api/Topics
         [HttpPost("{id}/join")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

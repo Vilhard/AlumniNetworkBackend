@@ -12,7 +12,6 @@ namespace AlumniNetworkBackend.Models.DTO.EventDTO
         public int Id { get; set; }
         public DateTime LastUpdated { get; set; }
         public string Name { get; set; }
-        [MaxLength(30)]
         public string Description { get; set; }
         public bool AllowGuests { get; set; }
         public string BannerImg { get; set; }

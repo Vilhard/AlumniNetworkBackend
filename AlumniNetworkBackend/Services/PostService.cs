@@ -36,7 +36,8 @@ namespace AlumniNetworkBackend.Services
             return post;
         }
         /// <summary>
-        /// Service handles finding previously added post from context and ...
+        /// Service handles finding post from context that the parameter defined post 
+        /// is trying to refer to as a parent post (i.e trying to comment under post).
         /// </summary>
         /// <param name="post"></param>
         /// <returns></returns>

@@ -56,7 +56,11 @@ namespace AlumniNetworkBackend.Controllers
             
         }
 
-        // GET: api/Users/5
+        /// <summary>
+        /// Returns a user pertaininig to the provided id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<UserReadDTO>> GetUserById(string id)
@@ -70,7 +74,12 @@ namespace AlumniNetworkBackend.Controllers
 
             return Ok(_mapper.Map<UserReadDTO>(user));
         }
-
+        /// <summary>
+        /// Makes partial update to the referenced user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dtoUser"></param>
+        /// <returns></returns>
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=
         [HttpPut("{id}")]
@@ -87,7 +96,11 @@ namespace AlumniNetworkBackend.Controllers
 
             return Ok(_mapper.Map<UserUpdateDTO>(updatedUser));
         }
-
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <param name="dtoUser"></param>
+        /// <returns></returns>
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

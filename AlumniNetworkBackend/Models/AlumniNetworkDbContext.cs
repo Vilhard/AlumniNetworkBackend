@@ -1,19 +1,16 @@
 ﻿using AlumniNetworkBackend.Models.Domain;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AlumniNetworkBackend.Models
 {
     public class AlumniNetworkDbContext : DbContext
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public AlumniNetworkDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) : base(options)
+        public AlumniNetworkDbContext(DbContextOptions options) : base(options)
         {
-            _httpContextAccessor = httpContextAccessor;
+           
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
@@ -25,7 +22,7 @@ namespace AlumniNetworkBackend.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
+            optionsBuilder.UseSqlServer("Data Source=tcp:alumninetworkportalserver1232.database.windows.net,1433;Initial Catalog=Alumni;User Id=owner@alumninetworkportalserver1232;Password=St3nm4n10");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
