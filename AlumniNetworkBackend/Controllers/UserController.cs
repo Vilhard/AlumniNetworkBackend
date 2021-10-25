@@ -1,32 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using AlumniNetworkBackend.Models;
 using AlumniNetworkBackend.Models.Domain;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
-using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using AlumniNetworkBackend.Models.DTO;
 using AlumniNetworkBackend.Models.DTO.UserDTO;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Net.Http;
-using System.Net;
 using System.Security.Claims;
 using AlumniNetworkBackend.Services;
-using Microsoft.AspNetCore.Cors;
-using System.Net.Mime;
 using System.Net.Mime;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
     [Produces(MediaTypeNames.Application.Json)]
     [Consumes(MediaTypeNames.Application.Json)]
     [ApiConventionType(typeof(DefaultApiConventions))]

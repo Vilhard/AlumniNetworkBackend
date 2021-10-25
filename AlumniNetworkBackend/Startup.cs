@@ -4,15 +4,10 @@ using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -67,13 +62,17 @@ namespace AlumniNetworkBackend
                 };
             });
             services.AddRouting(options => options.LowercaseUrls = true);
-            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
-            {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
-            }));
             services.AddMvc();
+            services.AddCors(
+            options => options.AddPolicy("AllowCors",
+            builder =>
+            {
+                builder
+                .AllowAnyOrigin()
+                .WithMethods("GET", "PUT", "POST", "DELETE")
+                .AllowAnyHeader();
+            })
+        );
             services.AddOptions();
             services.AddMemoryCache();
             services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
@@ -111,9 +110,7 @@ namespace AlumniNetworkBackend
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
-            app.UseCors("MyPolicy");
-
+            app.UseCors("AllowCors");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
