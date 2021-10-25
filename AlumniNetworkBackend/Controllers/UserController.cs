@@ -20,12 +20,16 @@ using System.Security.Claims;
 using AlumniNetworkBackend.Services;
 using Microsoft.AspNetCore.Cors;
 using System.Net.Mime;
+using System.Net.Mime;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
 
+    [Produces(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class UserController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
@@ -41,7 +45,10 @@ namespace AlumniNetworkBackend.Controllers
             _service = service;
         }
 
-        // GET: api/User
+        /// <summary>
+        /// Api endpoint api/users which returns the user info on registered user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<UserReadDTO>> GetUsers()
@@ -59,7 +66,11 @@ namespace AlumniNetworkBackend.Controllers
             
         }
 
-        // GET: api/Users/5
+        /// <summary>
+        /// Api endpoint api/users/id which gives you user info by user id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<UserReadDTO>> GetUserById(string id)
@@ -74,8 +85,13 @@ namespace AlumniNetworkBackend.Controllers
             return Ok(_mapper.Map<UserReadDTO>(user));
         }
 
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=
+        /// <summary>
+        /// Api endpoint api/users/id which lets user make a partial update on existing user
+        /// by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dtoUser"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<UserUpdateDTO>> UpdateUser(string id, UserUpdateDTO dtoUser)
@@ -94,6 +110,11 @@ namespace AlumniNetworkBackend.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         
+        /// <summary>
+        /// Api endpoint api/users which lets client to create a new user
+        /// </summary>
+        /// <param name="dtoUser"></param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<UserCreateDTO>> PostUser(UserCreateDTO newUser)

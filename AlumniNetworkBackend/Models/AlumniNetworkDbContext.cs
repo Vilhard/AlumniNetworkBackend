@@ -83,6 +83,8 @@ namespace AlumniNetworkBackend.Models
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
                 CreatedById = "2",
+                TargetGroupId = 1,
+                TargetTopicId = null,
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -99,6 +101,8 @@ namespace AlumniNetworkBackend.Models
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
                 CreatedById = "2",
+                TargetGroupId = 2,
+                TargetTopicId = null,
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -115,6 +119,8 @@ namespace AlumniNetworkBackend.Models
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
                 CreatedById = "1",
+                TargetGroupId = null,
+                TargetTopicId = 3,
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -131,6 +137,8 @@ namespace AlumniNetworkBackend.Models
                 StartTime = new DateTime(2021, 12, 12, 19, 30, 0),
                 EndTime = new DateTime(2021, 12, 12, 23, 30, 0),
                 CreatedById = "4",
+                TargetGroupId = null,
+                TargetTopicId = 4,
                 Group = { },
                 LastUpdated = new DateTime(2021, 12, 12, 23, 30, 0),
                 Posts = { },
@@ -758,6 +766,5 @@ namespace AlumniNetworkBackend.Models
             modelBuilder.Entity<Post>()
                .HasIndex(u => u.TargetUserId).IsUnique(false);
         }
-
     }
 }

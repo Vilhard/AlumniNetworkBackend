@@ -20,6 +20,7 @@ namespace AlumniNetworkBackend.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class PostController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
@@ -36,7 +37,6 @@ namespace AlumniNetworkBackend.Controllers
         /// Api endpoint GET: api/post returns all posts to topics and groups which the requesting user is a member of
         /// </summary>
         /// <returns></returns>
-        // GET: api/Post
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GeUserGroupAndTopicPosts()
@@ -105,7 +105,7 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<List<PostReadDTO>>(postsFromSpecificUser);
         }
         /// <summary>
-        /// Api emdpoint api/post/group/:group_id returns a list of posts that were sent with the described :group_id
+        /// Api endpoint api/post/group/:group_id returns a list of posts that were sent with the described :group_id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -127,7 +127,7 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<List<PostReadTopicGroupDTO>>(postsFromGroup);
         }
         /// <summary>
-        /// Api emdpoint api/post/topic/:topic_id returns a list of posts that were sent with the described :topic_id
+        /// Api endpoint api/post/topic/:topic_id returns a list of posts that were sent with the described :topic_id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -150,7 +150,7 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<List<PostReadTopicDTO>>(postsFromTopic);
         }
         /// <summary>
-        ///  Api emdpoint api/post/event/:event_id returns a list of posts that were sent with the described :event_id
+        ///  Api endpoint api/post/event/:event_id returns a list of posts that were sent with the described :event_id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
