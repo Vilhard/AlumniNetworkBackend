@@ -23,6 +23,7 @@ namespace AlumniNetworkBackend.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class GroupController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
@@ -76,11 +77,11 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<GroupReadDTO>(filteredGroup);
         }
 
-        // <summary>
+        /// <summary>
         /// Endpoint api/Groups which posts a new Group to database with name
         /// and description.
         /// </summary>
-        /// <param name="dtoTopic"></param>
+        /// <param name="dtoGroup"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

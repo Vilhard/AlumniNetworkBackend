@@ -21,8 +21,10 @@ namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Produces(MediaTypeNames.Application.Json)]
+    //[Produces(MediaTypeNames.Application.Json)]
     [Consumes(MediaTypeNames.Application.Json)]
+
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class TopicController : ControllerBase
     {
         private readonly IMapper _mapper;
