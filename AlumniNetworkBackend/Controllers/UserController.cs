@@ -18,11 +18,14 @@ using System.Net.Http;
 using System.Net;
 using System.Security.Claims;
 using AlumniNetworkBackend.Services;
+using Microsoft.AspNetCore.Cors;
+using System.Net.Mime;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class UserController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;
@@ -90,17 +93,27 @@ namespace AlumniNetworkBackend.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<User>> PostUser(UserCreateDTO dtoUser)
+        public async Task<ActionResult<UserCreateDTO>> PostUser(UserCreateDTO newUser)
         {
-            User domainUser = _mapper.Map<User>(dtoUser);
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            _context.Users.Add(domainUser);
-            await _context.SaveChangesAsync();
+            if (userId != newUser.Id)
+                return Unauthorized();
 
-            return CreatedAtAction("GetUser", new { id = domainUser.Id}, _mapper.Map<UserReadDTO>(domainUser));
+            User userToAdd = _mapper.Map<User>(newUser);
+
+            var user = await _service.AddUser(userToAdd);
+
+            if(user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<UserCreateDTO>(user));
         }
-
+        
     }
 }

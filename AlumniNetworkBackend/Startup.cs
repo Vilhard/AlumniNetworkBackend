@@ -38,6 +38,9 @@ namespace AlumniNetworkBackend
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
+                
+
+                
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -61,6 +64,12 @@ namespace AlumniNetworkBackend
                 };
             });
             services.AddRouting(options => options.LowercaseUrls = true);
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
             services.AddMvc();
             services.AddOptions();
             services.AddMemoryCache();
@@ -96,6 +105,8 @@ namespace AlumniNetworkBackend
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("MyPolicy");
 
             app.UseAuthorization();
 

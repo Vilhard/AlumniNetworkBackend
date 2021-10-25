@@ -11,5 +11,6 @@ namespace AlumniNetworkBackend.Services
     {
         public Task<User> GetUser(string id);
         public Task<User> UpdateUser(string id, User dtoUser);
+        public Task<User> AddUser(User user);
     }
 }

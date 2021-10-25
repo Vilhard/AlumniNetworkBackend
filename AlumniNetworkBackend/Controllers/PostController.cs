@@ -12,11 +12,14 @@ using AlumniNetworkBackend.Services;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Net.Mime;
 
 namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json)]
     public class PostController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;

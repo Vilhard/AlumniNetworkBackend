@@ -15,6 +15,7 @@ using System.Security.Claims;
 using AlumniNetworkBackend.Models.DTO.UserDTO;
 using AlumniNetworkBackend.Services;
 using System.Net.Mime;
+using System.Web.Http.Cors;
 
 namespace AlumniNetworkBackend.Controllers
 {

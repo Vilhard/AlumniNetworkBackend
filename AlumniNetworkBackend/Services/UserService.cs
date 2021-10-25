@@ -16,6 +16,14 @@ namespace AlumniNetworkBackend.Services
         {
             _context = context;
         }
+
+        public async Task<User> AddUser(User user)
+        {
+            var newUser = await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return newUser.Entity;
+        }
+
         public async Task<User> GetUser(string id)
         {
             return (await _context.Users.FindAsync(id));
