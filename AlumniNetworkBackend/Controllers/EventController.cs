@@ -21,6 +21,7 @@ namespace AlumniNetworkBackend.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Consumes(MediaTypeNames.Application.Json)]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class EventController : ControllerBase
     {
         private readonly AlumniNetworkDbContext _context;

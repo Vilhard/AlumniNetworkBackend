@@ -766,6 +766,5 @@ namespace AlumniNetworkBackend.Models
             modelBuilder.Entity<Post>()
                .HasIndex(u => u.TargetUserId).IsUnique(false);
         }
-
     }
 }
