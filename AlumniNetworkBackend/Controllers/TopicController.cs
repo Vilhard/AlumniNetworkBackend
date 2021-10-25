@@ -21,8 +21,9 @@ namespace AlumniNetworkBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Produces(MediaTypeNames.Application.Json)]
+    //[Produces(MediaTypeNames.Application.Json)]
     [Consumes(MediaTypeNames.Application.Json)]
+
     [ApiConventionType(typeof(DefaultApiConventions))]
     public class TopicController : ControllerBase
     {
@@ -68,7 +69,7 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<TopicReadDTO>(topic);
         }
 
-        /// <summary>
+        // <summary>
         /// Endpoint api/Topics which posts a new Topic to database with name
         /// and description.
         /// </summary>
@@ -91,11 +92,7 @@ namespace AlumniNetworkBackend.Controllers
             return CreatedAtAction("GetTopic", new { id = updatedTopic.Id }, _mapper.Map<TopicCreateDTO>(updatedTopic));
         }
 
-        /// <summary>
-        /// Api endpoint api/topics/id/join which lets client to create new topic membership record
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        // POST: api/Topics
         [HttpPost("{id}/join")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<TopicCreateMemberDTO>> PostTopicMember([FromRoute] int id)
