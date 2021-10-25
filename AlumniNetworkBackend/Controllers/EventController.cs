@@ -33,7 +33,7 @@ namespace AlumniNetworkBackend.Controllers
         }
 
         /// <summary>
-        /// Api endpoint api/Events for GET action which returns all events that 
+        /// Api endpoint api/event for GET action which returns all events that 
         /// belongs to Groups and Topics where user is subscribed 
         /// </summary>
         /// <returns></returns>
@@ -43,15 +43,15 @@ namespace AlumniNetworkBackend.Controllers
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            List<Event> eventsForGroupAndTopic = _context.Events
+            List<Event> eventsForGroupAndTopic = await _context.Events
                 .Where(e=>e.Group.Any(g=>g.Members.Any(m=>m.Id.Contains(userId))) || e.Topic.Any(g => g.Users.Any(m => m.Id.Contains(userId))))
-                .ToList();
+                .ToListAsync();
 
             return _mapper.Map<List<EventReadDTO>>(eventsForGroupAndTopic);
         }
 
         /// <summary>
-        /// EndPoint api/Event for Post action which specifies target audience and post if user
+        /// EndPoint api/event for Post action which specifies target audience and post if user
         /// is a member. 
         /// </summary>
         /// <param name="dtoEvent"></param>
@@ -99,7 +99,7 @@ namespace AlumniNetworkBackend.Controllers
         }
 
         /// <summary>
-        /// Endpoint api/Events/id Updates event table if user is the creator of the event.
+        /// Endpoint api/event/id Updates event table if user is the creator of the event.
         /// Lastupdated is automatically updated by service.
         /// </summary>
         /// <param name="id"></param>

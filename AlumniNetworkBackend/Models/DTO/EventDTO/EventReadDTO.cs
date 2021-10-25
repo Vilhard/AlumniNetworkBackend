@@ -18,8 +18,5 @@ namespace AlumniNetworkBackend.Models.DTO.EventDTO
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string CreatedById { get; set; }
-        //public ICollection<User> Users { get; set; }
-        //public ICollection<Topic> Topics { get; set; }
-        //public ICollection<Group> Groups { get; set; }
-    }
+     }
 }
