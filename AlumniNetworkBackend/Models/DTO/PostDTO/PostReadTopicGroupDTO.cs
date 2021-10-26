@@ -13,5 +13,6 @@ namespace AlumniNetworkBackend.Models.DTO.PostDTO
         public DateTime TimeStamp { get; set; }
         public int? TargetGroupId { get; set; }
         public int? TargetTopicId { get; set; }
+        public List<int> TargetPosts { get; set; }
     }
 }
