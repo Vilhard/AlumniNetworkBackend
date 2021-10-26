@@ -68,7 +68,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return Ok(_mapper.Map<UserReadDTO>(user));
