@@ -77,5 +77,15 @@ namespace AlumniNetworkBackend.Services
         {
             return _context.Posts.Any(p => p.Id == id);
         }
+
+        public async Task<List<Post>> GetRepliesAsync(int id)
+        {
+            List<Post> replies = await _context.Posts.Where(p => p.ReplyParentId == id).ToListAsync();
+            if(replies == null)
+            {
+                return null;
+            }
+            return replies;
+        }
     }
 }
