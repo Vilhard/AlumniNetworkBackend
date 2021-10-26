@@ -36,13 +36,9 @@ namespace AlumniNetworkBackend
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-                
-
-                
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    
                     IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
                     {
                         var client = new HttpClient();
@@ -58,7 +54,7 @@ namespace AlumniNetworkBackend
                         Configuration["TokenSecrets:IssuerURI"]
                     },
                     //This checks the token for a the 'aud' claim value
-                    ValidAudience = "account",
+                    ValidAudience = "account"
                 };
             });
             services.AddRouting(options => options.LowercaseUrls = true);
@@ -100,6 +96,11 @@ namespace AlumniNetworkBackend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseCors("AllowCors");
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseIpRateLimiting();
             if (env.IsDevelopment())
             {
@@ -107,11 +108,6 @@ namespace AlumniNetworkBackend
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlumniNetworkBackend v1"));
             }
-
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseCors("AllowCors");
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

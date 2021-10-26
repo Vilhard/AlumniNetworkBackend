@@ -42,7 +42,7 @@ namespace AlumniNetworkBackend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<TopicReadDTO>>> GetTopics()
         {
             List<Topic> topics = await _service.GetAllTopics();
