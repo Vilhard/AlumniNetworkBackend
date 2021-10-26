@@ -100,6 +100,11 @@ namespace AlumniNetworkBackend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseCors("AllowCors");
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseIpRateLimiting();
             if (env.IsDevelopment())
             {
@@ -108,10 +113,7 @@ namespace AlumniNetworkBackend
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlumniNetworkBackend v1"));
             }
 
-            app.UseHttpsRedirection();
-            app.UseRouting();
             app.UseCors("AllowCors");
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
