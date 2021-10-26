@@ -57,6 +57,19 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
+        [HttpGet("reply/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadDTO>>> GetPostReplies(int id)
+        {
+            var replies = await _postService.GetRepliesAsync(id);
+
+            if (replies == null)
+            {
+                return NotFound(null);
+            }
+
+            return Ok(_mapper.Map<List<PostReadDTO>>(replies));
+        }
         /// <summary>
         /// Api endpoint GET: api/post/user returns all direct posts that were send to the requesting user
         /// </summary>
