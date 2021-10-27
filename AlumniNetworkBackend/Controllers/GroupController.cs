@@ -118,13 +118,14 @@ namespace AlumniNetworkBackend.Controllers
             bool isNotAMember = groupMembers.Members.Where(u => u.Id.Contains(userId)).Equals(true);
             var groupNewUserList = await _service.AddUserToGroup(id, userId);
 
+
+            if (groupPrivacy.IsPrivate == true && isNotAMember)
+            {
+                return new StatusCodeResult(403);
+            }
             if (groupNewUserList == null)
             {
                 return NotFound();
-            }
-            else if(groupPrivacy.IsPrivate == true && isNotAMember)
-            {
-                return new StatusCodeResult(403);
             }
 
             return Ok(_mapper.Map<GroupCreateMemberDTO>(groupNewUserList));

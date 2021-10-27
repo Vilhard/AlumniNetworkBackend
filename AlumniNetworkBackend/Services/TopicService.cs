@@ -58,16 +58,8 @@ namespace AlumniNetworkBackend.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Topic> AddUserToTopic(int topicId, string userId)
+        public async Task<Topic> AddUserToTopic(Topic topicToUpdate, string userId)
         {
-            Topic topicToUpdate = await _context.Topics
-                .Include(t => t.Users)
-                .Where(t => t.Id == topicId)
-                .FirstAsync();
-
-            if (topicToUpdate == null)
-                return null;
-
             List<User> users = topicToUpdate.Users.ToList();
 
             User topicNewUser = await _context.Users.FindAsync(userId);

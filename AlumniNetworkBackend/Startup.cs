@@ -53,7 +53,7 @@ namespace AlumniNetworkBackend
                     {
                         Configuration["TokenSecrets:IssuerURI"]
                     },
-                    //This checks the token for a the 'aud' claim value
+                    ////This checks the token for a the 'aud' claim value
                     ValidAudience = "account"
                 };
             });
@@ -96,18 +96,18 @@ namespace AlumniNetworkBackend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseCors("AllowCors");
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseIpRateLimiting();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlumniNetworkBackend v1"));
             }
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseCors("AllowCors");
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseIpRateLimiting();
 
             app.UseEndpoints(endpoints =>
             {

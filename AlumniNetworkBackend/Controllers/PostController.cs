@@ -54,6 +54,9 @@ namespace AlumniNetworkBackend.Controllers
                 .Where(u => u.TargetGroup.Members.Any(x => x.Id == userId)).ToListAsync();
 
             var combinedList = userTopicPosts.Concat(userGroupPosts).OrderByDescending(x => x.TimeStamp).ToList();
+            bool isEmpty = !combinedList.Any();
+            if (isEmpty)
+                return NoContent();
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }

@@ -19,10 +19,9 @@ namespace AlumniNetworkBackend.Models
         public DbSet<Post> Posts { get; set; }
         public DbSet<RSVP> RSVP { get; set; }
 
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;Integrated Security=True;");
+            optionsBuilder.UseSqlServer("server=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;trusted_connection=true;MultipleActiveResultSets=true");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
