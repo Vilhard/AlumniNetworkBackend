@@ -27,13 +27,15 @@ namespace AlumniNetworkBackend.Controllers
     [ApiConventionType(typeof(DefaultApiConventions))]
     public class TopicController : ControllerBase
     {
+        private readonly AlumniNetworkDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITopicService _service;
 
-        public TopicController(ITopicService service, IMapper mapper)
+        public TopicController(ITopicService service, IMapper mapper, AlumniNetworkDbContext context)
         {
             _mapper = mapper;
             _service = service;
+            _context = context;
         }
 
         /// <summary>
@@ -63,13 +65,13 @@ namespace AlumniNetworkBackend.Controllers
 
             if (topic == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return _mapper.Map<TopicReadDTO>(topic);
         }
 
-        // <summary>
+        /// <summary>
         /// Endpoint api/Topics which posts a new Topic to database with name
         /// and description.
         /// </summary>
@@ -86,7 +88,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (updatedTopic == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return CreatedAtAction("GetTopic", new { id = updatedTopic.Id }, _mapper.Map<TopicCreateDTO>(updatedTopic));
@@ -102,10 +104,19 @@ namespace AlumniNetworkBackend.Controllers
         public async Task<ActionResult<TopicCreateMemberDTO>> PostTopicMember([FromRoute] int id)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
-            var topicNewUserList = await _service.AddUserToTopic(id, userId);
+
+            Topic topicToUpdate = await _context.Topics
+                .Include(t => t.Users)
+                .Where(t => t.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (topicToUpdate == null)
+                return NotFound(null);
+
+            var topicNewUserList = await _service.AddUserToTopic(topicToUpdate, userId);
 
             if (topicNewUserList == null)
-                return NotFound();
+                return NotFound(null);
 
             return Ok(_mapper.Map<TopicCreateMemberDTO>(topicNewUserList));
         }

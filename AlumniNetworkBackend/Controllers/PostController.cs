@@ -54,6 +54,9 @@ namespace AlumniNetworkBackend.Controllers
                 .Where(u => u.TargetGroup.Members.Any(x => x.Id == userId)).ToListAsync();
 
             var combinedList = userTopicPosts.Concat(userGroupPosts).OrderByDescending(x => x.TimeStamp).ToList();
+            bool isEmpty = !combinedList.Any();
+            if (isEmpty)
+                return NoContent();
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
@@ -61,8 +64,7 @@ namespace AlumniNetworkBackend.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetTimelinePosts(Post post)
         {
-            //string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
-            string userId = "bfbdcdec-106a-4507-a62e-2353b81d341b";
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
 
             var userTopicPosts = await _context.Posts
@@ -104,12 +106,15 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetPostReplies(int id)
         {
-            var replies = await _postService.GetRepliesAsync(id);
-
-            if (replies == null)
+            var postExists = await _context.Posts.Where(x => x.Id == id).AnyAsync();
+            if (!postExists)
             {
                 return NotFound(null);
             }
+            List<Post> replies = await _context.Posts.Where(p => p.ReplyParentId == id).ToListAsync();
+            bool isEmpty = !replies.Any();
+            if (isEmpty)
+                return NoContent(null);
 
             return Ok(_mapper.Map<List<PostReadDTO>>(replies));
         }
@@ -130,7 +135,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (userDirectMessages == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return _mapper.Map<List<PostReadDTO>>(userDirectMessages);
@@ -144,9 +149,10 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetSpecificDirectPostsFromUser(string id)
         {
-           if (id == null)
+            var userExists = await _context.Users.Where(x => x.Id == id).AnyAsync();
+           if (!userExists)
             {
-                return NotFound();
+                return NotFound(null);
             }
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
 
@@ -169,6 +175,11 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GetSpecificPostsFromGroup(int id)
         {
+            var groupExists = await _context.Groups.Where(x => x.Id == id).AnyAsync();
+            if (!groupExists)
+            {
+                return NotFound(null);
+            }
             var postsFromGroup = await _context.Posts
                 .Include(t => t.TargetGroup)
                 .ThenInclude(p => p.Posts)
@@ -177,7 +188,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (postsFromGroup == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(postsFromGroup);
@@ -200,7 +211,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (postsFromTopic == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return _mapper.Map<List<PostReadTopicDTO>>(postsFromTopic);
@@ -214,6 +225,11 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadEventDTO>>> GetSpecificDirectPostsFromEvent(int id)
         {
+            var eventExists = await _context.Events.Where(x => x.Id == id).AnyAsync();
+            if (!eventExists)
+            {
+                return NotFound(null);
+            }
             var postsFromEvent = await _context.Posts
                 .Include(t => t.TargetEvent)
                 .ThenInclude(p => p.Posts)
@@ -222,7 +238,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (postsFromEvent == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return _mapper.Map<List<PostReadEventDTO>>(postsFromEvent);
@@ -241,8 +257,14 @@ namespace AlumniNetworkBackend.Controllers
         {
             if (id != dtoPost.Id)
             {
-                return BadRequest();
+                return BadRequest(null);
             }
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+
+            var findTargetPost = await _context.Posts.FindAsync(id);
+            if (findTargetPost.SenderId != userId)
+                return Forbid();
+
             if (dtoPost.TargetEvent != null || dtoPost.TargetGroup != null || dtoPost.TargetTopic !=null 
                 || dtoPost.ReplyParentId != null || dtoPost.TargetUser != null|| dtoPost.TargetPost != null)
             {
@@ -250,7 +272,7 @@ namespace AlumniNetworkBackend.Controllers
             }
             if (!_postService.PostExists(id))
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             Post domainPost = _mapper.Map<Post>(dtoPost);
@@ -271,12 +293,17 @@ namespace AlumniNetworkBackend.Controllers
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
             bool isMember = dtoPost.Members.Any(u => u.Id == userId);
+
+            var foundUser = await _context.Users.FindAsync(userId);
+            if (foundUser == null)
+                return NotFound(null);
             
            if (isMember)
             {
                     Post post = new()
                     {
                         SenderId = userId,
+                        SenderName = foundUser.Name,
                         Text = dtoPost.Text,
                         TargetEventId = dtoPost?.TargetEvent,
                         TargetGroupId = dtoPost?.TargetGroup,
@@ -288,7 +315,7 @@ namespace AlumniNetworkBackend.Controllers
                     };
                     var result = await _postService.AddPostAsync(post);
                     if (result == null)
-                        return BadRequest();
+                        return BadRequest(null);
                 return _mapper.Map<PostReadDTO>(result);
             } else 
             {

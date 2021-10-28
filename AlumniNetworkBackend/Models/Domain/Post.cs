@@ -18,6 +18,7 @@ namespace AlumniNetworkBackend.Models.Domain
         //One to many relationship with user to determine the sender
         [ForeignKey(nameof(Sender))]
         public string SenderId { get; set; }
+        public string SenderName { get; set; }
         public User Sender { get; set; }
         public ICollection<Post> TargetPosts { get; set; } = new List<Post>();
         //Nullable property which can be used to know if post is main or reply

@@ -10,6 +10,7 @@ namespace AlumniNetworkBackend.Models.DTO.PostDTO
     {
         public string Text { get; set; }
         public string SenderId { get; set; }
+        public string SenderName { get; set; }
         public string TargetUserId { get; set; }
         public DateTime TimeStamp { get; set; }
         public List<int> TargetPosts { get; set; }
