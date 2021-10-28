@@ -86,10 +86,12 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<UserReadDTO>>> GetAttendees(int id)
         {
-            Event eventWithAttendees = await _context.Events.Include(u => u.Users).Where(e => e.Id == id).FirstAsync();
-            if (eventWithAttendees == null)
-                return NotFound(null);
+            var eventExists = await _context.Events.Where(x => x.Id == id).AnyAsync();
+            if (!eventExists)
+                return NotFound();
 
+            Event eventWithAttendees = await _context.Events.Include(u => u.Users).Where(e => e.Id == id).FirstAsync();
+            
             List<User> attendees = eventWithAttendees.Users.ToList();
 
             return Ok(_mapper.Map<List<UserReadDTO>>(attendees));
