@@ -2,6 +2,7 @@
 using AlumniNetworkBackend.Models.Domain;
 using AlumniNetworkBackend.Models.DTO.EventDTO;
 using AlumniNetworkBackend.Models.DTO.RSVPDTO;
+using AlumniNetworkBackend.Models.DTO.UserDTO;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -76,7 +77,24 @@ namespace AlumniNetworkBackend.Controllers
 
             return Ok(_mapper.Map<EventReadDTO>(eventsForGroupAndTopicById));
         }
+        /// <summary>
+        /// Endpoint that returns all attendees of the event
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("attendees/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<UserReadDTO>>> GetAttendees(int id)
+        {
+            Event eventWithAttendees = await _context.Events.Include(u => u.Users).Where(e => e.Id == id).FirstAsync();
+            if (eventWithAttendees == null)
+                return NotFound(null);
 
+            List<User> attendees = eventWithAttendees.Users.ToList();
+
+            return Ok(_mapper.Map<List<UserReadDTO>>(attendees));
+            
+        }
         /// <summary>
         /// EndPoint api/event for Post action which specifies target audience and post if user
         /// is a member. 
