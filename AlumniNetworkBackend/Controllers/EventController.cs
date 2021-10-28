@@ -51,6 +51,16 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<List<EventReadDTO>>(eventsForGroupAndTopic);
         }
 
+        [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<EventReadDTO>> GetSingleEvent(int id)
+        {
+            Event singleEvent = await _context.Events.FindAsync(id);
+            if (singleEvent == null)
+                return NotFound(null);
+
+            return Ok(_mapper.Map<EventReadDTO>(singleEvent));
+        }
         /// <summary>
         /// EndPoint api/event for Post action which specifies target audience and post if user
         /// is a member. 
