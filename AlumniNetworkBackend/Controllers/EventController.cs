@@ -62,6 +62,24 @@ namespace AlumniNetworkBackend.Controllers
             return Ok(_mapper.Map<EventReadDTO>(singleEvent));
         }
         /// <summary>
+        /// Api endpoint api/event for GET action which returns an event by Id that 
+        /// belongs to Groups and Topics where user is subscribed 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<EventReadDTO>> GetEventsById(int id)
+        {
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+            Event eventsForGroupAndTopicById = await _context.Events
+                .Where(e=>e.Id == id)
+                .FirstAsync();
+
+            return _mapper.Map<EventReadDTO>(eventsForGroupAndTopicById);
+        }
+
+        /// <summary>
         /// EndPoint api/event for Post action which specifies target audience and post if user
         /// is a member. 
         /// </summary>
