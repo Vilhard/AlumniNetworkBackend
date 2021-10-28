@@ -2,12 +2,12 @@
 # Alumni Network Portal API
 
 ##### Made by: 
-- ###### Ville Hotakainen
-- ###### Omar El Tokhy
-- ###### Sergei Kaukiainen
+- ###### [Ville Hotakainen](https://github.com/Vilhard)
+- ###### [Omar El Tokhy](https://github.com/omareltokhy)
+- ###### [Sergei Kaukiainen](https://github.com/billmaister)
 
 ###### Other project participants
-- ###### Mikko Nikku
+- ###### [Mikko Nikku](https://github.com/MNiccu)
 
 ## Installation
 ```
