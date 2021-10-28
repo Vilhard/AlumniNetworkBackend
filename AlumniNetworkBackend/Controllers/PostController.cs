@@ -57,6 +57,49 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
+        [HttpPost("timeline")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<PostReadDTO>>> GetTimelinePosts(Post post)
+        {
+            //string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+            string userId = "bfbdcdec-106a-4507-a62e-2353b81d341b";
+
+
+            var userTopicPosts = await _context.Posts
+                .Include(t => t.TargetTopic)
+                .ThenInclude(u => u.Users)
+                .Where(u => u.TargetTopic.Users.Any(x => x.Id == userId)).ToListAsync();
+
+            var userGroupPosts = await _context.Posts
+                .Include(t => t.TargetGroup)
+                .ThenInclude(u => u.Members)
+                .Where(u => u.TargetGroup.Members.Any(x => x.Id == userId)).ToListAsync();
+
+            if (post.TimeStamp == null)
+            {
+                var combinedList = userTopicPosts.Concat(userGroupPosts).OrderByDescending(x => x.TimeStamp).ToList();
+                if (combinedList.Count > 10)
+                    return Ok(_mapper.Map<List<PostReadDTO>>(combinedList.GetRange(0, 10)));
+                else
+                    return Ok(_mapper.Map<List<PostReadDTO>>(combinedList.GetRange(0, combinedList.Count)));
+
+            }
+            else
+            {
+                var combinedList = userTopicPosts.Concat(userGroupPosts).Where(x => x.TimeStamp < post.TimeStamp).OrderByDescending(x => x.TimeStamp).ToList();
+                if (combinedList.Count > 10)
+                    return Ok(_mapper.Map<List<PostReadDTO>>(combinedList.GetRange(0, 10)));
+                else
+                    return Ok(_mapper.Map<List<PostReadDTO>>(combinedList.GetRange(0, combinedList.Count)));
+            }
+
+
+        }
+        /// <summary>
+        /// Method returns all replies of specific post/thread
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("reply/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetPostReplies(int id)
@@ -238,9 +281,10 @@ namespace AlumniNetworkBackend.Controllers
                         TargetEventId = dtoPost?.TargetEvent,
                         TargetGroupId = dtoPost?.TargetGroup,
                         TargetTopicId = dtoPost?.TargetTopic,
-                        ReplyParentId = dtoPost.ReplyParentId,
+                        ReplyParentId = dtoPost?.ReplyParentId,
                         TargetUserId = dtoPost?.TargetUser,
-                        TimeStamp = DateTime.Now
+                        TimeStamp = dtoPost.TimeStamp
+                        //TimeStamp = DateTime.Now
                     };
                     var result = await _postService.AddPostAsync(post);
                     if (result == null)

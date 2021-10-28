@@ -9,7 +9,7 @@ namespace AlumniNetworkBackend.Models.Domain
     public class Post
     {
         public int Id { get; set; }
-        public DateTime TimeStamp { get; set; }
+        public DateTime? TimeStamp { get; set; }
         public string Text { get; set; }
 
         // SenderID & ReplyParentID relationshipt pitää kattoo
