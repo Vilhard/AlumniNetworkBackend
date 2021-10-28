@@ -21,7 +21,7 @@ namespace AlumniNetworkBackend.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("server=5CG05206QT\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;trusted_connection=true;MultipleActiveResultSets=true");
+            optionsBuilder.UseSqlServer("server=5CG04676KY\\SQLEXPRESS;Initial Catalog=AlumniNetworkDB;trusted_connection=true;MultipleActiveResultSets=true");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
