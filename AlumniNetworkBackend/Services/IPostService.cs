@@ -11,7 +11,6 @@ namespace AlumniNetworkBackend.Services
     {
         public Task<Post> AddPostAsync(Post post);
         public Task<Post> PostUpdateAsync(int id, Post post);
-        public Task<List<Post>> GetRepliesAsync(int id);
         public bool PostExists(int id);
     }
 }

@@ -64,12 +64,15 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetPostReplies(int id)
         {
-            var replies = await _postService.GetRepliesAsync(id);
-
-            if (replies == null)
+            var postExists = await _context.Posts.Where(x => x.Id == id).AnyAsync();
+            if (!postExists)
             {
-                return NotFound(null);
+                return NotFound();
             }
+            List<Post> replies = await _context.Posts.Where(p => p.ReplyParentId == id).ToListAsync();
+            bool isEmpty = !replies.Any();
+            if (isEmpty)
+                return NoContent();
 
             return Ok(_mapper.Map<List<PostReadDTO>>(replies));
         }
@@ -104,7 +107,8 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetSpecificDirectPostsFromUser(string id)
         {
-           if (id == null)
+            var userExists = await _context.Users.Where(x => x.Id == id).AnyAsync();
+           if (!userExists)
             {
                 return NotFound();
             }
@@ -129,6 +133,11 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadTopicGroupDTO>>> GetSpecificPostsFromGroup(int id)
         {
+            var groupExists = await _context.Groups.Where(x => x.Id == id).AnyAsync();
+            if (!groupExists)
+            {
+                return NotFound();
+            }
             var postsFromGroup = await _context.Posts
                 .Include(t => t.TargetGroup)
                 .ThenInclude(p => p.Posts)
@@ -174,6 +183,11 @@ namespace AlumniNetworkBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadEventDTO>>> GetSpecificDirectPostsFromEvent(int id)
         {
+            var eventExists = await _context.Events.Where(x => x.Id == id).AnyAsync();
+            if (!eventExists)
+            {
+                return NotFound();
+            }
             var postsFromEvent = await _context.Posts
                 .Include(t => t.TargetEvent)
                 .ThenInclude(p => p.Posts)
@@ -203,6 +217,12 @@ namespace AlumniNetworkBackend.Controllers
             {
                 return BadRequest();
             }
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
+
+            var findTargetPost = await _context.Posts.FindAsync(id);
+            if (findTargetPost.SenderId != userId)
+                return Forbid();
+
             if (dtoPost.TargetEvent != null || dtoPost.TargetGroup != null || dtoPost.TargetTopic !=null 
                 || dtoPost.ReplyParentId != null || dtoPost.TargetUser != null|| dtoPost.TargetPost != null)
             {
@@ -231,12 +251,17 @@ namespace AlumniNetworkBackend.Controllers
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value; // will give the user's userId
             bool isMember = dtoPost.Members.Any(u => u.Id == userId);
+
+            var foundUser = await _context.Users.FindAsync(userId);
+            if (foundUser == null)
+                return NotFound();
             
            if (isMember)
             {
                     Post post = new()
                     {
                         SenderId = userId,
+                        SenderName = foundUser.Name,
                         Text = dtoPost.Text,
                         TargetEventId = dtoPost?.TargetEvent,
                         TargetGroupId = dtoPost?.TargetGroup,
