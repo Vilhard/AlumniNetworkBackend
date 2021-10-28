@@ -4,7 +4,7 @@
 ##### Made by: 
 - ###### Ville Hotakainen
 - ###### Omar El Tokhy
-- ###### Sergei 
+- ###### Sergei Kaukiainen
 
 ###### Other project participants
 - ###### Mikko Nikku
@@ -997,7 +997,7 @@ Returns a list of posts that were send to the specific post `id` as a reply
 
 # Event
 
-##### Post Attributes:
+##### Event Attributes:
 - id `(Number)`: unique identifier.
 - Name `(string)`: Name of the event
 - Description `(string)`: Description of the event
@@ -1061,13 +1061,318 @@ Returns a list of posts that were send to the specific post `id` as a reply
     "status": 404
 }
 ```
-### `POST` https://localhost:44344/api/event/id/invite/group/id
+### `POST` https://localhost:44344/api/event/event-id/invite/group/group-id
 ###### Headers
 - Content-Type:application/json
 - Authorization: Bearer ``your-token``
 
 ##### Request body
-#
+`201` Created - Creates a new event group invitation for the event and group specified in the path
+```json
+{
+  "lastUpdated": "2021-10-28T20:07:34.018Z",
+  "id": 1,
+  "name": "test-user",
+  "description": "event-description",
+  "allowGuests": true,
+  "bannerImg": "some-image.jpg",
+  "startTime": "2021-10-28T20:07:34.018Z",
+  "endTime": "2021-10-28T20:07:34.018Z",
+  "createdById": "1",
+  "targetTopicId": null,
+  "targetGroupId": 1
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a member of group where invite is trying to be posted
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the target event or group does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
+
+### `DELETE` https://localhost:44344/api/event/event-id/invite/group/group-id
+###### Headers
+-Content-Typeapplication-json
+-Authorization: Bearer `your-token`
+
+##### Response body
+`200` Ok - Deletes a group event invitation record specified in the path
+```json
+{
+  "lastUpdated": "2021-12-12T23:30:00",
+  "id": 2,
+  "name": "Experis Graduation",
+  "description": "Experis Graduation party",
+  "allowGuests": true,
+  "bannerImg": "http://experisacademy.no/storage/images/fbook.jpg",
+  "startTime": "2021-10-30T19:30:00",
+  "endTime": "2021-10-30T23:30:00",
+  "createdById": "2",
+  "targetTopicId": null,
+  "targetGroupId": 2
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a member of group where invite is trying to be deleted
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the target event or group does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
+
+### `POST` https://localhost:44344/api/event/event-id/invite/topic/topic-id
+###### Headers
+- Content-Type:application/json
+- Authorization: Bearer ``your-token``
+
+##### Request body
+`201` Created - Creates a new event topic invitation for the event and topic specified in the path
+```json
+{
+  "lastUpdated": "2021-10-28T20:07:34.018Z",
+  "id": 1,
+  "name": "test-user",
+  "description": "event-description",
+  "allowGuests": true,
+  "bannerImg": "some-image.jpg",
+  "startTime": "2021-10-28T20:07:34.018Z",
+  "endTime": "2021-10-28T20:07:34.018Z",
+  "createdById": "1",
+  "targetTopicId": 1,
+  "targetGroupId": null
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a member of topic where invite is trying to be posted
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the target topic or event does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
+
+### `DELETE` https://localhost:44344/api/event/event-id/invite/topic/topic-id
+###### Headers
+-Content-Typeapplication-json
+-Authorization: Bearer `your-token`
+
+##### Response body
+`200` Ok - Deletes a topic event invitation record specified in the path
+```json
+{
+  "lastUpdated": "2021-12-12T23:30:00",
+  "id": 2,
+  "name": "test-topic",
+  "description": "test-description",
+  "allowGuests": true,
+  "bannerImg": "example.jpg",
+  "startTime": "2021-10-30T19:30:00",
+  "endTime": "2021-10-30T23:30:00",
+  "createdById": "2",
+  "targetTopicId": 2,
+  "targetGroupId": null
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a member of topic where invite is trying to be deleted
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the target topic or event does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
+
+### `POST` https://localhost:44344/api/event/event-id/invite/user/user-id
+###### Headers
+- Content-Type:application/json
+- Authorization: Bearer ``your-token``
+
+##### Request body
+`201` Created - Creates a new event user invitation for the event and user specified in the path
+```json
+{
+  "lastUpdated": "2021-10-28T20:07:34.018Z",
+  "id": 1,
+  "name": "test-user",
+  "description": "event-description",
+  "allowGuests": true,
+  "bannerImg": "some-image.jpg",
+  "startTime": "2021-10-28T20:07:34.018Z",
+  "endTime": "2021-10-28T20:07:34.018Z",
+  "createdById": "1",
+  "targetTopicId": 1,
+  "targetGroupId": null
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a creator of the event the request is going to result in forbidden result
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the target user or event does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
+
+### `DELETE` https://localhost:44344/api/event/event-id/invite/user/user-id
+###### Headers
+-Content-Typeapplication-json
+-Authorization: Bearer `your-token`
+
+##### Response body
+`200` Ok - Deletes a user event invitation record specified in the path
+```json
+{
+  "lastUpdated": "2021-12-12T23:30:00",
+  "id": 2,
+  "name": "test-topic",
+  "description": "test-description",
+  "allowGuests": true,
+  "bannerImg": "example.jpg",
+  "startTime": "2021-10-30T19:30:00",
+  "endTime": "2021-10-30T23:30:00",
+  "createdById": "2",
+  "targetTopicId": 2,
+  "targetGroupId": null
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a creator of the event the request is going to result in forbidden result
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the target user or event does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
+### `PUT` https://localhost:44344/api/event/id
+###### Headers
+-Content-Type: application-json
+-Authorization: Bearer `your-token`
+
+#### Request body
+`204` Ok- Updates an event record specified in the path
+```json
+{
+  "id": 1,
+  "lastUpdated": "2021-10-28T21:32:43.751Z",
+  "name": "test",
+  "description": "test-description",
+  "allowGuests": true,
+  "bannerImg": "example.jpg",
+  "startTime": "2021-10-28T21:32:43.751Z",
+  "endTime": "2021-10-28T21:32:43.751Z"
+}
+```
+`400` Bad Request - If the parameter is not valid
+```json
+{
+    "title": "One or more validation errors occurred.",
+    "status": 400,
+    "errors": {
+        "id": [
+            "The value 's' is not valid."
+        ]
+    }
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a creator of the event the request is going to result in forbidden result
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the event does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
+
+### `POST` https://localhost:44344/api/event/event-id/rsvp
+###### Headers
+- Content-Type:application/json
+- Authorization: Bearer ``your-token``
+
+##### Request body
+`201` Created - Creates a new RSVP record for the event specified in the path
+```json
+{
+  "lastUpdated": "2021-10-28T21:50:36.489Z",
+  "guestCount": 7,
+  "userId": "2",
+  "eventId": 3
+}
+```
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`403` Forbidden - If the requesting user is not a creator of the event the request is going to result in forbidden result
+```json
+{
+    "title": "Forbidden",
+    "status": 403,
+}
+```
+`404` Not Found - If the target event does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
 
 ### `GET` https://localhost:44344/api/event
 ###### Headers
@@ -1123,7 +1428,57 @@ Returns a list of posts that were send to the specific post `id` as a reply
 
 `401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
 
+### `GET` https://localhost:44344/api/event/attendees/id
+###### Headers
+- Content-Type:application/json
+- Authorization: Bearer ``your-token``
 
+##### Response body
+`200` OK - Returns list of members that are attending `id` event
+```json
+[
+    {
+        "id": "2",
+        "name": "Hermione Granger",
+        "username": "TheGirlWhoReads",
+        "picture": "https://data.topquizz.com/distant/quizz/big/6/0/9/9/219906_527364a914.jpg",
+        "status": "Reading books",
+        "bio": "I like reading",
+        "funFact": "I secretly like Ron"
+    },
+    {
+        "id": "3",
+        "name": "Ron Weasley",
+        "username": "TheBoyWhoGinger",
+        "picture": "https://data.topquizz.com/distant/quizz/big/4/5/4/9/239454_33e86ba948.jpg",
+        "status": "Eating candy",
+        "bio": "Huh?",
+        "funFact": "I secretly like Hermione"
+    }
+]
+```
+`400` Bad Request - If the parameter is not valid
+```json
+{
+    "title": "One or more validation errors occurred.",
+    "status": 400,
+    "errors": {
+        "id": [
+            "The value 's' is not valid."
+        ]
+    }
+}
+```
+
+`401` Unauthorized - This happens when bearer token  (`your-token`) is invalid, so be sure to check that it is valid
+
+`404` Not Found - If the event does not exist in the database
+```json
+{
+    "title": "Not Found",
+    "status": 404
+}
+```
 ## License
 
 MIT
