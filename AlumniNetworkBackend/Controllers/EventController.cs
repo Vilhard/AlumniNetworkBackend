@@ -51,16 +51,7 @@ namespace AlumniNetworkBackend.Controllers
             return _mapper.Map<List<EventReadDTO>>(eventsForGroupAndTopic);
         }
 
-        [HttpGet("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<EventReadDTO>> GetSingleEvent(int id)
-        {
-            Event singleEvent = await _context.Events.FindAsync(id);
-            if (singleEvent == null)
-                return NotFound(null);
-
-            return Ok(_mapper.Map<EventReadDTO>(singleEvent));
-        }
+        
         /// <summary>
         /// Api endpoint api/event for GET action which returns an event by Id that 
         /// belongs to Groups and Topics where user is subscribed 
@@ -76,7 +67,10 @@ namespace AlumniNetworkBackend.Controllers
                 .Where(e=>e.Id == id)
                 .FirstAsync();
 
-            return _mapper.Map<EventReadDTO>(eventsForGroupAndTopicById);
+            if (eventsForGroupAndTopicById == null)
+                return NotFound(null);
+
+            return Ok(_mapper.Map<EventReadDTO>(eventsForGroupAndTopicById));
         }
 
         /// <summary>
