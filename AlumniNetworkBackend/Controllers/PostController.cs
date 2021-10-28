@@ -114,7 +114,7 @@ namespace AlumniNetworkBackend.Controllers
             List<Post> replies = await _context.Posts.Where(p => p.ReplyParentId == id).ToListAsync();
             bool isEmpty = !replies.Any();
             if (isEmpty)
-                return NoContent(null);
+                return NoContent();
 
             return Ok(_mapper.Map<List<PostReadDTO>>(replies));
         }
