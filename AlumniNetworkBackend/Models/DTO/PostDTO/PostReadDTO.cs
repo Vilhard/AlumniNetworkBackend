@@ -14,5 +14,6 @@ namespace AlumniNetworkBackend.Models.DTO.PostDTO
         public string TargetUserId { get; set; }
         public DateTime TimeStamp { get; set; }
         public List<int> TargetPosts { get; set; }
+        public User Sender { get; set; }
     }
 }

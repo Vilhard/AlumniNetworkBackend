@@ -54,6 +54,29 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<EventReadDTO>>(eventsForGroupAndTopic);
         }
+
+        
+        /// <summary>
+        /// Api endpoint api/event for GET action which returns an event by Id that 
+        /// belongs to Groups and Topics where user is subscribed 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<EventReadDTO>> GetEventsById(int id)
+        {
+            string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+            Event eventsForGroupAndTopicById = await _context.Events
+                .Where(e=>e.Id == id)
+                .FirstAsync();
+
+            if (eventsForGroupAndTopicById == null)
+                return NotFound(null);
+
+            return Ok(_mapper.Map<EventReadDTO>(eventsForGroupAndTopicById));
+        }
+
         /// <summary>
         /// EndPoint api/event for Post action which specifies target audience and post if user
         /// is a member. 
@@ -84,7 +107,7 @@ namespace AlumniNetworkBackend.Controllers
             var groupExists = await _context.Groups.Where(x => x.Id == dtoEvent.TargetGroupId).AnyAsync();
             
             if (!topicExists || !groupExists)
-                return NotFound();
+                return NotFound(null);
 
             bool isTopicMember = await _context.Topics
                 .Where(t => t.Id == dtoEvent.TargetTopicId)
@@ -124,7 +147,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (id != dtoEvent.Id)
             {
-                return BadRequest();
+                return BadRequest(null);
             }
             if (thisEvent.CreatedById != userId)
             {
@@ -132,7 +155,7 @@ namespace AlumniNetworkBackend.Controllers
             }
             if (!EventExists(id))
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             thisEvent.LastUpdated = DateTime.Now;
@@ -204,9 +227,9 @@ namespace AlumniNetworkBackend.Controllers
             if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
-                return NotFound();
+                return NotFound(null);
             if (thisGroup == null)
-                return NotFound();
+                return NotFound(null);
 
             List<Group> groups = thisEvent.Group.ToList();
             groups.Remove(thisGroup);
@@ -236,9 +259,9 @@ namespace AlumniNetworkBackend.Controllers
             if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
-                return NotFound();
+                return NotFound(null);
             if (thisTopic == null)
-                return NotFound();
+                return NotFound(null);
 
             List<Topic> topics = thisEvent.Topic.ToList();
             topics.Add(thisTopic);
@@ -268,9 +291,9 @@ namespace AlumniNetworkBackend.Controllers
             if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
-                return NotFound();
+                return NotFound(null);
             if (thisTopic == null)
-                return NotFound();
+                return NotFound(null);
 
             List<Topic> topics = thisEvent.Topic.ToList();
             topics.Remove(thisTopic);
@@ -300,9 +323,9 @@ namespace AlumniNetworkBackend.Controllers
             if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
-                return NotFound();
+                return NotFound(null);
             if (thisUser == null)
-                return NotFound();
+                return NotFound(null);
 
             List<User> users = thisEvent.Users.ToList();
             users.Add(thisUser);
@@ -332,9 +355,9 @@ namespace AlumniNetworkBackend.Controllers
             if (thisEvent.CreatedById != userId)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
-                return NotFound();
+                return NotFound(null);
             if (thisUser == null)
-                return NotFound();
+                return NotFound(null);
 
             List<User> users = thisEvent.Users.ToList();
             users.Remove(thisUser);
@@ -367,9 +390,9 @@ namespace AlumniNetworkBackend.Controllers
             if (eventGroupMember == null || eventGroupMember == null)
                 return new StatusCodeResult(403);
             if (!EventExists(eventId))
-                return NotFound();
+                return NotFound(null);
             if (thisEvent== null)
-                return NotFound();
+                return NotFound(null);
 
             RSVP newRSVPRecord = new()
             {

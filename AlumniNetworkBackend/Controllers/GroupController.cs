@@ -94,7 +94,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if(updatedGroup == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return Ok(_mapper.Map<GroupCreateDTO>(updatedGroup));
@@ -125,7 +125,7 @@ namespace AlumniNetworkBackend.Controllers
             }
             if (groupNewUserList == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return Ok(_mapper.Map<GroupCreateMemberDTO>(groupNewUserList));

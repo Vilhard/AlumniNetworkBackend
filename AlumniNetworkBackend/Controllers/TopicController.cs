@@ -65,7 +65,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (topic == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return _mapper.Map<TopicReadDTO>(topic);
@@ -88,7 +88,7 @@ namespace AlumniNetworkBackend.Controllers
 
             if (updatedTopic == null)
             {
-                return NotFound();
+                return NotFound(null);
             }
 
             return CreatedAtAction("GetTopic", new { id = updatedTopic.Id }, _mapper.Map<TopicCreateDTO>(updatedTopic));
@@ -111,12 +111,12 @@ namespace AlumniNetworkBackend.Controllers
                 .FirstOrDefaultAsync();
 
             if (topicToUpdate == null)
-                return NotFound();
+                return NotFound(null);
 
             var topicNewUserList = await _service.AddUserToTopic(topicToUpdate, userId);
 
             if (topicNewUserList == null)
-                return NotFound();
+                return NotFound(null);
 
             return Ok(_mapper.Map<TopicCreateMemberDTO>(topicNewUserList));
         }
