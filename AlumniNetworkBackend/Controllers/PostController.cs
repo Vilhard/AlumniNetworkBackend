@@ -60,8 +60,23 @@ namespace AlumniNetworkBackend.Controllers
 
             return _mapper.Map<List<PostReadTopicGroupDTO>>(combinedList);
         }
+        /// <summary>
+        /// Endpoint return single post by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<PostReadDTO>> GetSinglePostById(int id)
+        {
+            Post singlePost = await _context.Posts.Include(p => p.TargetTopic).Where(p => p.Id == id).FirstAsync();
+            if (singlePost == null)
+                return NotFound(null);
+
+            return Ok(_mapper.Map<PostReadDTO>(singlePost));
+        }
         [HttpPost("timeline")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<PostReadDTO>>> GetTimelinePosts(Post post)
         {
             string userId = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
