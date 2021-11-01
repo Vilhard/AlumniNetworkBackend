@@ -310,7 +310,7 @@ namespace AlumniNetworkBackend.Controllers
                         TargetTopicId = dtoPost?.TargetTopic,
                         ReplyParentId = dtoPost?.ReplyParentId,
                         TargetUserId = dtoPost?.TargetUser,
-                        TimeStamp = dtoPost.TimeStamp
+                        TimeStamp = DateTime.Now
                         //TimeStamp = DateTime.Now
                     };
                     var result = await _postService.AddPostAsync(post);
