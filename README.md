@@ -65,7 +65,7 @@ Change`["TokenSecrets:KeyURI"]` to use  `<localhost>/auth/realms/<your-realm>/pr
 
 **Now everything is setup correctly to be able to the API to it's full function.**
 ### PS
-Incase of error happening because of keyvaul configuration, then navigate to Program.cs and remove following code.
+In case of error happening because of keyvault configuration, then navigate to Program.cs and remove following code.
 
 ```json
 .ConfigureAppConfiguration((context, builder) =>
