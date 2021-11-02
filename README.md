@@ -67,7 +67,7 @@ Change`["TokenSecrets:KeyURI"]` to use  `<localhost>/auth/realms/<your-realm>/pr
 ### PS
 In case of error happening because of keyvault configuration, then navigate to Program.cs and remove following code.
 
-```json
+```
 .ConfigureAppConfiguration((context, builder) =>
             {
                 var keyVaultEndpoint = GetKeyVaultEndpoint();
