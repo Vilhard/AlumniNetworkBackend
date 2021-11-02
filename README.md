@@ -1,6 +1,8 @@
  
 # Alumni Network Portal API
 
+This .NET Core Web API is part of a Noroff .NET Fullstack bootcamp case project that was done in conjuction with [Alumni Network Frontend](https://github.com/MNiccu/alumni-network-frontend)
+
 ##### Made by: 
 - ###### [Ville Hotakainen](https://github.com/Vilhard)
 - ###### [Omar El Tokhy](https://github.com/omareltokhy)
@@ -62,6 +64,27 @@ Change `["TokenSecrets:KeyURI"]` to use `<Localhost>/auth/realms/<your-realm>`
 Change`["TokenSecrets:KeyURI"]` to use  `<localhost>/auth/realms/<your-realm>/protocol/openid-connect/certs`
 
 **Now everything is setup correctly to be able to the API to it's full function.**
+### PS
+Incase of error happening because of keyvaul configuration, then navigate to Program.cs and remove following code.
+
+```json
+.ConfigureAppConfiguration((context, builder) =>
+            {
+                var keyVaultEndpoint = GetKeyVaultEndpoint();
+                if (!string.IsNullOrEmpty(keyVaultEndpoint))
+                {
+                    var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                    var keyVaultClient = new KeyVaultClient(
+                        new KeyVaultClient.AuthenticationCallback(
+                            azureServiceTokenProvider.KeyVaultTokenCallback));
+
+                    builder.AddAzureKeyVault(
+                        keyVaultEndpoint,
+                        keyVaultClient,
+                        new DefaultKeyVaultSecretManager());
+                }
+            })
+```
 
 # API Documentation
 
